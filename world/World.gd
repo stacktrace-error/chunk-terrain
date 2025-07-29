@@ -1,6 +1,7 @@
 extends Node2D
 class_name World
 
+@export var noise : FastNoiseLite
 @export var map : TileMapLayer
 @export var seed : int
 ## Entity data and IDs.
@@ -10,9 +11,15 @@ var used_chunks : Array[Vector2i] = [Vector2i(-1, -1), Vector2i(-1, 0), Vector2i
 
 const chunk_size : Vector2i = Vector2i(16, 16)
 
-func _input(event):
+func _input(_event):
 	if Input.is_action_just_pressed("save"): save_file()
 	if Input.is_action_just_pressed("load"): load_file()
+
+func _process(delta):
+	if Input.is_action_pressed("regenerate"):
+		var cxy : Vector2i = local_to_chunk(get_local_mouse_position())
+		print(cxy)
+		generate_chunk(cxy[0], cxy[1])
 
 #region save/load
 func save_file():
@@ -63,6 +70,29 @@ static func serialize_chunk_tiles(tilemap:TileMapLayer, cx:int, cy:int) -> Array
 			
 		chunk[x] = tiles
 	return chunk
+#endregion
+
+#region generation
+func generate_chunk(cx:int, cy:int) -> void:
+	clear_chunk(cx, cy)
+	
+	var xy : Vector2i = Vector2i()
+	for x in chunk_size[0]: for y in chunk_size[1]:
+		xy[0] = cx * chunk_size[0] + x
+		xy[1] = cy * chunk_size[1] + y
+		
+		if noise.get_noise_1d(xy[0]) * 10 + xy[1] > 0:
+			map.set_cell(xy, 0, Vector2i.ZERO)
+		else: map.set_cell(xy, -1, Vector2i.ZERO)
+#endregion
+
+#region utility
+func clear_chunk(cx:int, cy:int):
+	pass
+
+func map_to_chunk(xy:Vector2) -> Vector2i: return Vector2i(floor(xy / (chunk_size as Vector2)))
+
+func local_to_chunk(xy:Vector2) -> Vector2i: return map_to_chunk(map.local_to_map(xy))
 #endregion
 
 #region entities
