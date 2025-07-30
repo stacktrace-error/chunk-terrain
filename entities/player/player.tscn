@@ -1,13 +1,30 @@
-[gd_scene load_steps=3 format=3 uid="uid://cye331dhe8nxs"]
+[gd_scene load_steps=5 format=3 uid="uid://cye331dhe8nxs"]
 
 [ext_resource type="Script" uid="uid://dbfi5alfwdxcf" path="res://entities/player/Player.gd" id="1_oul6g"]
+[ext_resource type="Texture2D" uid="uid://u4py108xjd5r" path="res://icon.svg" id="2_abrql"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_oul6g"]
 radius = 16.0
 height = 48.0
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_abrql"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = false
+properties/0/replication_mode = 2
+
 [node name="Player" type="CharacterBody2D"]
+collision_layer = 2
 script = ExtResource("1_oul6g")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CapsuleShape2D_oul6g")
+
+[node name="Icon" type="Sprite2D" parent="."]
+self_modulate = Color(0.704779, 0.0411446, 1, 1)
+position = Vector2(9.53674e-07, 0)
+scale = Vector2(0.25, 0.375)
+texture = ExtResource("2_abrql")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_interval = 5.0
+replication_config = SubResource("SceneReplicationConfig_abrql")

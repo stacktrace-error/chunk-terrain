@@ -1,18 +1,19 @@
-[gd_scene load_steps=8 format=4 uid="uid://bhmd37i5q3aa2"]
+[gd_scene load_steps=7 format=4 uid="uid://bhmd37i5q3aa2"]
 
 [ext_resource type="Script" uid="uid://3veqymigrnck" path="res://world/World.gd" id="1_6xmxd"]
 [ext_resource type="Texture2D" uid="uid://bot23f1b5wvra" path="res://tiles/tile.png" id="2_tcf2h"]
 [ext_resource type="PackedScene" uid="uid://ct1j5swp03c2p" path="res://entities/item/item.tscn" id="3_4717r"]
-[ext_resource type="Script" uid="uid://b7pj2tc0p8npy" path="res://Camera.gd" id="4_h5o24"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_4717r"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4717r"]
 texture = ExtResource("2_tcf2h")
 0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 
 [sub_resource type="TileSet" id="TileSet_h5o24"]
 physics_layer_0/collision_layer = 1
+physics_layer_0/collision_mask = 0
 sources/0 = SubResource("TileSetAtlasSource_4717r")
 
 [node name="World" type="Node2D" node_paths=PackedStringArray("map")]
@@ -27,5 +28,6 @@ tile_set = SubResource("TileSet_h5o24")
 [node name="0" parent="." instance=ExtResource("3_4717r")]
 position = Vector2(122, -25)
 
-[node name="Camera2D" type="Camera2D" parent="."]
-script = ExtResource("4_h5o24")
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("uid://cye331dhe8nxs")
+spawn_path = NodePath("..")

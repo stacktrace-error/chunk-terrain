@@ -83,7 +83,7 @@ func generate_chunk(cx:int, cy:int) -> void:
 		
 		if noise.get_noise_1d(xy[0]) * 10 + xy[1] > 0:
 			map.set_cell(xy, 0, Vector2i.ZERO)
-		else: map.set_cell(xy, -1, Vector2i.ZERO)
+		else: map.erase_cell(xy)
 #endregion
 
 #region utility

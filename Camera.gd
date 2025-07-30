@@ -1,7 +1,7 @@
 extends Camera2D
 
-func _process(delta):
-	position += Input.get_vector("left", "right", "up", "down") * delta * 200
+#func _process(delta):
+	#position += Input.get_vector("left", "right", "up", "down") * delta * 200
 
 func _input(event):
 	if event.is_action("zoom_in"):
