@@ -3,7 +3,7 @@ class_name World
 
 @export var noise : FastNoiseLite
 @export var map : TileMapLayer
-@export var seed : int
+@export var gnereation_seed : int
 ## Entity data and IDs.
 var entities : Dictionary[int, Entity] = {}
 ## The chunk coordinates of chunks that should be saved.
@@ -15,7 +15,7 @@ func _input(_event):
 	if Input.is_action_just_pressed("save"): save_file()
 	if Input.is_action_just_pressed("load"): load_file()
 
-func _process(delta):
+func _process(_delta):
 	if Input.is_action_pressed("regenerate"):
 		var cxy : Vector2i = local_to_chunk(get_local_mouse_position())
 		print(cxy)
@@ -53,6 +53,7 @@ static func deserialize_chunk_tiles(tilemap:TileMapLayer, chunk:Array, cx:int, c
 		xy[1] = cy * chunk_size[1] + y
 		if chunk[x][y]:
 			tilemap.set_cell(xy, 0, Vector2i.ZERO)
+		else: tilemap.erase_cell(xy)
 
 static func serialize_chunk_tiles(tilemap:TileMapLayer, cx:int, cy:int) -> Array[Array]:
 	var xy : Vector2i = Vector2i()
@@ -74,8 +75,6 @@ static func serialize_chunk_tiles(tilemap:TileMapLayer, cx:int, cy:int) -> Array
 
 #region generation
 func generate_chunk(cx:int, cy:int) -> void:
-	clear_chunk(cx, cy)
-	
 	var xy : Vector2i = Vector2i()
 	for x in chunk_size[0]: for y in chunk_size[1]:
 		xy[0] = cx * chunk_size[0] + x
@@ -87,12 +86,13 @@ func generate_chunk(cx:int, cy:int) -> void:
 #endregion
 
 #region utility
-func clear_chunk(cx:int, cy:int):
-	pass
+func generate_unused(cxy:Vector2i) -> void:
+	if !used_chunks.has(cxy):
+		generate_chunk(cxy[0], cxy[1])
 
 func map_to_chunk(xy:Vector2) -> Vector2i: return Vector2i(floor(xy / (chunk_size as Vector2)))
-
 func local_to_chunk(xy:Vector2) -> Vector2i: return map_to_chunk(map.local_to_map(xy))
+func global_to_chunk(xy:Vector2) -> Vector2i: return local_to_chunk(map.to_local(xy))
 #endregion
 
 #region entities

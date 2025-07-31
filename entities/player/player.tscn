@@ -10,10 +10,11 @@ height = 48.0
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_abrql"]
 properties/0/path = NodePath(".:position")
 properties/0/spawn = false
-properties/0/replication_mode = 2
+properties/0/replication_mode = 1
 
 [node name="Player" type="CharacterBody2D"]
-collision_layer = 2
+collision_layer = 8
+platform_floor_layers = 4294967041
 script = ExtResource("1_oul6g")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -26,5 +27,4 @@ scale = Vector2(0.25, 0.375)
 texture = ExtResource("2_abrql")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
-replication_interval = 5.0
 replication_config = SubResource("SceneReplicationConfig_abrql")

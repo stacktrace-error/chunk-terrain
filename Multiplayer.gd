@@ -5,17 +5,17 @@ var peer : ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 
 func _ready() -> void:
 	var args : PackedStringArray = OS.get_cmdline_args()
-	if "--host" in args: _on_host_pressed()
-	elif "--join" in args: _on_join_pressed()
+	if "--host" in args: host()
+	elif "--join" in args: join()
 
-func _on_host_pressed() -> void:
+func host() -> void:
 	peer.create_server(135)
 	multiplayer.multiplayer_peer = peer
 	multiplayer.peer_connected.connect(add_player)
 	add_player()
 	DisplayServer.window_set_title.call_deferred("hosting")
 
-func _on_join_pressed() -> void:
+func join() -> void:
 	peer.create_client("localhost", 135)
 	multiplayer.multiplayer_peer = peer
 	DisplayServer.window_set_title.call_deferred("joined")
