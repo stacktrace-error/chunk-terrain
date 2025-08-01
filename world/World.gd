@@ -19,7 +19,7 @@ func _process(_delta):
 	if Input.is_action_pressed("regenerate"):
 		var cxy : Vector2i = local_to_chunk(get_local_mouse_position())
 		print(cxy)
-		generate_chunk(cxy[0], cxy[1])
+		generate_chunk(cxy)
 
 #region save/load
 func save_file():
@@ -73,12 +73,26 @@ static func serialize_chunk_tiles(tilemap:TileMapLayer, cx:int, cy:int) -> Array
 	return chunk
 #endregion
 
+#region networking
+func send_or_generate_chunk(cxy:Vector2i):
+	if !used_chunks.has(cxy): 
+		generate_chunk(cxy)
+	elif multiplayer.get_unique_id() == 1:
+		send_chunk.rpc(serialize_chunk_tiles(map, cxy[0], cxy[1]), cxy)
+	
+
+@rpc("authority", "call_remote", "reliable")
+func send_chunk(chunk:Array[Array], cxy:Vector2i):
+	deserialize_chunk_tiles(map, chunk, cxy[0], cxy[1])
+
+#endregion
+
 #region generation
-func generate_chunk(cx:int, cy:int) -> void:
+func generate_chunk(cxy:Vector2i) -> void:
 	var xy : Vector2i = Vector2i()
 	for x in chunk_size[0]: for y in chunk_size[1]:
-		xy[0] = cx * chunk_size[0] + x
-		xy[1] = cy * chunk_size[1] + y
+		xy[0] = cxy[0] * chunk_size[0] + x
+		xy[1] = cxy[1] * chunk_size[1] + y
 		
 		if noise.get_noise_1d(xy[0]) * 10 + xy[1] > 0:
 			map.set_cell(xy, 0, Vector2i.ZERO)
@@ -86,10 +100,6 @@ func generate_chunk(cx:int, cy:int) -> void:
 #endregion
 
 #region utility
-func generate_unused(cxy:Vector2i) -> void:
-	if !used_chunks.has(cxy):
-		generate_chunk(cxy[0], cxy[1])
-
 func map_to_chunk(xy:Vector2) -> Vector2i: return Vector2i(floor(xy / (chunk_size as Vector2)))
 func local_to_chunk(xy:Vector2) -> Vector2i: return map_to_chunk(map.local_to_map(xy))
 func global_to_chunk(xy:Vector2) -> Vector2i: return local_to_chunk(map.to_local(xy))

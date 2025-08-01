@@ -7,6 +7,10 @@ func _ready() -> void:
 	set_multiplayer_authority(name.trim_prefix("Player ").to_int())
 	if is_multiplayer_authority():
 		Camera.reparent(self, false)
+	
+	if multiplayer.get_unique_id() != 1: 
+		GameWorld.map.clear()
+		load_chunks()
 
 func _process(delta) -> void:
 	velocity.y = lerp(velocity.y, 300.0, delta * 3)
@@ -30,4 +34,4 @@ func load_chunks() -> void:
 	for x : int in range(-1, 2): for y : int in range(-1, 2):
 		gxy[0] = x + cxy[0]
 		gxy[1] = y + cxy[1]
-		GameWorld.generate_unused(gxy)
+		GameWorld.send_or_generate_chunk(gxy)
