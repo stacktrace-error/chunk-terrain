@@ -8,9 +8,9 @@ func _enter_tree():
 	if is_multiplayer_authority():
 		Camera.reparent(self, false)
 	
-	if multiplayer.get_unique_id() != 1: 
-		GameWorld.map.clear()
-		load_chunks()
+	if multiplayer.get_unique_id() != 1: GameWorld.map.clear()
+	
+	load_chunks()
 
 func _process(delta) -> void:
 	velocity.y = lerp(velocity.y, 300.0, delta * 3)
@@ -36,7 +36,7 @@ func load_chunks() -> void:
 	if !(is_multiplayer_authority() or multiplayer.get_unique_id() == 1): return
 	
 	var gxy : Vector2i
-	for x : int in range(-1, 2): for y : int in range(-1, 2):
+	for x : int in range(-2, 3): for y : int in range(-2, 3):
 		gxy[0] = x + cxy[0]
 		gxy[1] = y + cxy[1]
 		GameWorld.send_or_generate_chunk(gxy)
