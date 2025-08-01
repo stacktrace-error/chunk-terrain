@@ -3,7 +3,7 @@ class_name Player
 
 var cxy : Vector2i
 
-func _ready() -> void:
+func _enter_tree():
 	set_multiplayer_authority(name.trim_prefix("Player ").to_int())
 	if is_multiplayer_authority():
 		Camera.reparent(self, false)
@@ -20,6 +20,11 @@ func _process(delta) -> void:
 		
 		if Input.is_action_just_pressed("up"):
 			velocity.y = -500
+		
+		if Input.is_action_pressed("place_tile"):
+			GameWorld.place_tile.rpc(GameWorld.global_to_map(get_global_mouse_position()))
+		elif Input.is_action_pressed("remove_tile"):
+			GameWorld.remove_tile.rpc(GameWorld.global_to_map(get_global_mouse_position()))
 	
 	move_and_slide()
 	
