@@ -5,6 +5,11 @@ extends Camera2D
 
 func _input(event):
 	if event.is_action("zoom_in"):
-		zoom += Vector2.ONE * 0.5
+		set_cam_zoom(zoom.x + 0.5)
 	elif event.is_action("zoom_out"):
-		zoom -= Vector2.ONE * 0.5
+		set_cam_zoom(zoom.x - 0.5)
+
+func set_cam_zoom(cam_zoom:float):
+	var z : float = clampf(cam_zoom, 0.1, 10.0)
+	zoom.x = z
+	zoom.y = z

@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://ct1j5swp03c2p" path="res://entities/item/item.tscn" id="3_4717r"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_4717r"]
+seed = 3
 domain_warp_enabled = true
 domain_warp_frequency = 0.01
 domain_warp_fractal_lacunarity = 8.02

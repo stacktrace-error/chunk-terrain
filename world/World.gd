@@ -21,6 +21,8 @@ func _input(_event):
 		#print(cxy)
 		#generate_chunk(cxy)
 
+#func _draw():
+	#pass
 
 #region save/load
 func save_file():
@@ -59,38 +61,38 @@ func load_file():
 #region (de)serialization
 #TODO switch to byte output
 static func deserialize_chunk_tiles(tilemap:TileMapLayer, cxy:Vector2i, chunk:Array) -> void:
-	var xy : Vector2i = Vector2i()
-	for x in chunk_size[0]: for y in chunk_size[1]:
-		xy[0] = cxy[0] * chunk_size[0] + x
-		xy[1] = cxy[1] * chunk_size[1] + y
-		if chunk[x][y]:
-			tilemap.set_cell(xy, 0, Vector2i.ZERO)
-		else: tilemap.erase_cell(xy)
+	var mxy : Vector2i = Vector2i()
+	for mx in chunk_size[0]: for my in chunk_size[1]:
+		mxy[0] = cxy[0] * chunk_size[0] + mx
+		mxy[1] = cxy[1] * chunk_size[1] + my
+		if chunk[mx][my]:
+			tilemap.set_cell(mxy, 0, Vector2i.ZERO)
+		else: tilemap.erase_cell(mxy)
 
 #TODO switch to byte output
 static func serialize_chunk_tiles(tilemap:TileMapLayer, cxy:Vector2i) -> Array[Array]:
-	var xy : Vector2i = Vector2i()
+	var mxy : Vector2i = Vector2i()
 	var chunk : Array[Array]
 	chunk.resize(chunk_size[0])
 	
-	for x in chunk_size[0]:
+	for mx in chunk_size[0]:
 		var tiles : Array[bool] = []
 		tiles.resize(chunk_size[1])
 		
-		for y in chunk_size[1]:
-			xy[0] = cxy[0] * chunk_size[0] + x
-			xy[1] = cxy[1] * chunk_size[1] + y
-			tiles[y] = tilemap.get_cell_atlas_coords(xy).x != -1
+		for my in chunk_size[1]:
+			mxy[0] = cxy[0] * chunk_size[0] + mx
+			mxy[1] = cxy[1] * chunk_size[1] + my
+			tiles[my] = tilemap.get_cell_atlas_coords(mxy).x != -1
 			
-		chunk[x] = tiles
+		chunk[mx] = tiles
 	return chunk
 
 @warning_ignore("unused_parameter")
-static func serialize_tile(tilemap:TileMapLayer, x:int, y:int):
+static func serialize_tile(tilemap:TileMapLayer, mx:int, my:int):
 	return # TODO turn into bytes and shit out
 
 @warning_ignore("unused_parameter")
-static func deserialize_tile(tilemap:TileMapLayer, x:int, y:int, tile):
+static func deserialize_tile(tilemap:TileMapLayer, mx:int, my:int, tile):
 	pass # TODO something something decipher bytes and place tile from that
 #endregion
 
@@ -109,37 +111,37 @@ func send_chunk(chunk:Array[Array], cxy:Vector2i): deserialize_chunk_tiles(map, 
 ##TODO send only to players who are loading these chunks
 ##TODO send serialized tile
 @rpc("any_peer", "call_local", "reliable")
-func place_tile(xy:Vector2i):
-	map.set_cell(xy, 0, Vector2i.ZERO)
-	mark_chunk_used_map(xy)
+func place_tile(mxy:Vector2i):
+	map.set_cell(mxy, 0, Vector2i.ZERO)
+	mark_chunk_used_map(mxy)
 
 ##TODO send only to players who are loading these chunks
 @rpc("any_peer", "call_local", "reliable")
-func remove_tile(xy:Vector2i):
-	map.erase_cell(xy)
-	mark_chunk_used_map(xy)
+func remove_tile(mxy:Vector2i):
+	map.erase_cell(mxy)
+	mark_chunk_used_map(mxy)
 #endregion
 
 
 #region generation
 func generate_chunk(cxy:Vector2i) -> void:
-	var xy : Vector2i = Vector2i()
-	for x in chunk_size[0]: for y in chunk_size[1]:
-		xy[0] = cxy[0] * chunk_size[0] + x
-		xy[1] = cxy[1] * chunk_size[1] + y
+	var mxy : Vector2i = Vector2i()
+	for mx in chunk_size[0]: for my in chunk_size[1]:
+		mxy[0] = cxy[0] * chunk_size[0] + mx
+		mxy[1] = cxy[1] * chunk_size[1] + my
 		
-		if noise.get_noise_1d(xy[0]) * 10 + xy[1] > 0:
-			map.set_cell(xy, 0, Vector2i.ZERO)
-		else: map.erase_cell(xy)
+		if noise.get_noise_1d(mxy[0]) * 20 + mxy[1] > 0:
+			map.set_cell(mxy, 0, Vector2i.ZERO)
+		else: map.erase_cell(mxy)
 #endregion
 
 
 #region utility
 func mark_chunk_used(cxy:Vector2i): if !cxy in used_chunks: used_chunks.append(cxy)
-func mark_chunk_used_map(xy:Vector2): mark_chunk_used(map_to_chunk(xy))
+func mark_chunk_used_map(mxy:Vector2): mark_chunk_used(map_to_chunk(mxy))
 
-func map_to_chunk(xy:Vector2) -> Vector2i: return Vector2i((xy / (chunk_size as Vector2).floor()))
-func local_to_chunk(xy:Vector2) -> Vector2i: return map_to_chunk(map.local_to_map(xy))
+func map_to_chunk(mxy:Vector2) -> Vector2i: return (mxy / (chunk_size as Vector2)).floor()
+func local_to_chunk(lxy:Vector2) -> Vector2i: return map_to_chunk(map.local_to_map(lxy))
 func global_to_chunk(xy:Vector2) -> Vector2i: return local_to_chunk(map.to_local(xy))
 
 func global_to_map(xy:Vector2) -> Vector2i: return map.local_to_map(map.to_local(xy))
