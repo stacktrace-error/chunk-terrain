@@ -13,7 +13,9 @@ config_version=5
 config/name="storm"
 run/main_scene="uid://cq5aeyk33xfvo"
 config/features=PackedStringArray("4.4", "GL Compatibility")
-config/icon="res://icon.svg"
+boot_splash/fullsize=false
+boot_splash/image="uid://bqyp2x4sdtnjl"
+config/icon="uid://bqyp2x4sdtnjl"
 
 [autoload]
 

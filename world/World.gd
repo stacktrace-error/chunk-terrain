@@ -7,11 +7,11 @@ class_name World
 ## Entity data and IDs.
 var entities : Dictionary[int, Entity] = {}
 ## The chunk coordinates of chunks that should be saved.
-var used_chunks : Array[Vector2i] = [Vector2i(-1, -1), Vector2i(-1, 0), Vector2i(0, -1), Vector2i(0, 0)]
+var used_chunks : Array[Vector2i] = []
 
 const chunk_size : Vector2i = Vector2i(16, 16)
 
-func _input(_event):
+func _input(_event : InputEvent) -> void:
 	if Input.is_action_just_pressed("save"): save_file()
 	if Input.is_action_just_pressed("load"): load_file()
 
@@ -25,7 +25,7 @@ func _input(_event):
 	#pass
 
 #region save/load
-func save_file():
+func save_file() -> void:
 	var chunks : Dictionary[String, Dictionary] = {}
 	
 	for cxy : Vector2i in used_chunks:
@@ -38,7 +38,7 @@ func save_file():
 	file.store_string(JSON.stringify(chunks, "\t"))
 	file.close()
 
-func load_file():
+func load_file() -> void:
 	var file : FileAccess = FileAccess.open(str("user://", name, ".dat"), FileAccess.READ)
 	var chunks : Dictionary = JSON.parse_string(file.get_as_text())
 	
@@ -47,7 +47,7 @@ func load_file():
 	used_chunks.resize(chunks.size())
 	
 	var i : int = 0
-	for c in chunks:
+	for c : String in chunks:
 		var arr : Array = JSON.parse_string(c) #can't json vectors, parse an array instead
 		var cxy : Vector2i = Vector2i(arr[0], arr[1])
 		
@@ -59,65 +59,61 @@ func load_file():
 
 
 #region (de)serialization
-#TODO switch to byte output
 static func deserialize_chunk_tiles(tilemap:TileMapLayer, cxy:Vector2i, chunk:Array) -> void:
 	var mxy : Vector2i = Vector2i()
 	for mx in chunk_size[0]: for my in chunk_size[1]:
 		mxy[0] = cxy[0] * chunk_size[0] + mx
 		mxy[1] = cxy[1] * chunk_size[1] + my
-		if chunk[mx][my]:
-			tilemap.set_cell(mxy, 0, Vector2i.ZERO)
-		else: tilemap.erase_cell(mxy)
+		deserialize_tile(tilemap, mxy, chunk[mx][my])
 
-#TODO switch to byte output
 static func serialize_chunk_tiles(tilemap:TileMapLayer, cxy:Vector2i) -> Array[Array]:
 	var mxy : Vector2i = Vector2i()
 	var chunk : Array[Array]
 	chunk.resize(chunk_size[0])
 	
 	for mx in chunk_size[0]:
-		var tiles : Array[bool] = []
+		var tiles : Array[int] = []
 		tiles.resize(chunk_size[1])
 		
 		for my in chunk_size[1]:
 			mxy[0] = cxy[0] * chunk_size[0] + mx
 			mxy[1] = cxy[1] * chunk_size[1] + my
-			tiles[my] = tilemap.get_cell_atlas_coords(mxy).x != -1
+			tiles[my] = serialize_tile(tilemap, mxy)
 			
 		chunk[mx] = tiles
 	return chunk
 
-@warning_ignore("unused_parameter")
-static func serialize_tile(tilemap:TileMapLayer, mx:int, my:int):
-	return # TODO turn into bytes and shit out
+static func serialize_tile(tilemap:TileMapLayer, mxy:Vector2i) -> int:
+	return tilemap.get_cell_source_id(mxy)
 
-@warning_ignore("unused_parameter")
-static func deserialize_tile(tilemap:TileMapLayer, mx:int, my:int, tile):
-	pass # TODO something something decipher bytes and place tile from that
+static func deserialize_tile(tilemap:TileMapLayer, mxy:Vector2i, tile:int) -> void:
+	if tile != -1:
+		tilemap.set_cell(mxy, tile, Vector2i.ZERO)
+	else: tilemap.erase_cell(mxy)
 #endregion
 
 
 #region networking
-func send_or_generate_chunk(cxy:Vector2i):
+func send_or_generate_chunk(cxy:Vector2i) -> void:
 	if !cxy in used_chunks: 
 		generate_chunk(cxy)
 	elif multiplayer.get_unique_id() == 1:
 		send_chunk.rpc(serialize_chunk_tiles(map, cxy), cxy) ##TODO should be rpc_id()
 
 @rpc("authority", "call_remote", "reliable")
-func send_chunk(chunk:Array[Array], cxy:Vector2i): deserialize_chunk_tiles(map, cxy, chunk)
+func send_chunk(chunk:Array[Array], cxy:Vector2i) -> void: deserialize_chunk_tiles(map, cxy, chunk)
 
 
 ##TODO send only to players who are loading these chunks
 ##TODO send serialized tile
 @rpc("any_peer", "call_local", "reliable")
-func place_tile(mxy:Vector2i):
-	map.set_cell(mxy, 0, Vector2i.ZERO)
+func place_tile(mxy:Vector2i) -> void:
+	map.set_cell(mxy, 1, Vector2i.ZERO)
 	mark_chunk_used_map(mxy)
 
 ##TODO send only to players who are loading these chunks
 @rpc("any_peer", "call_local", "reliable")
-func remove_tile(mxy:Vector2i):
+func remove_tile(mxy:Vector2i) -> void:
 	map.erase_cell(mxy)
 	mark_chunk_used_map(mxy)
 #endregion
@@ -137,8 +133,8 @@ func generate_chunk(cxy:Vector2i) -> void:
 
 
 #region utility
-func mark_chunk_used(cxy:Vector2i): if !cxy in used_chunks: used_chunks.append(cxy)
-func mark_chunk_used_map(mxy:Vector2): mark_chunk_used(map_to_chunk(mxy))
+func mark_chunk_used(cxy:Vector2i) -> void: if !cxy in used_chunks: used_chunks.append(cxy)
+func mark_chunk_used_map(mxy:Vector2) -> void: mark_chunk_used(map_to_chunk(mxy))
 
 func map_to_chunk(mxy:Vector2) -> Vector2i: return (mxy / (chunk_size as Vector2)).floor()
 func local_to_chunk(lxy:Vector2) -> Vector2i: return map_to_chunk(map.local_to_map(lxy))

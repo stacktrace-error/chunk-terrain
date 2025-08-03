@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=4 uid="uid://bhmd37i5q3aa2"]
+[gd_scene load_steps=9 format=4 uid="uid://bhmd37i5q3aa2"]
 
 [ext_resource type="Script" uid="uid://3veqymigrnck" path="res://world/World.gd" id="1_6xmxd"]
 [ext_resource type="Texture2D" uid="uid://bot23f1b5wvra" path="res://tiles/tile.png" id="2_tcf2h"]
 [ext_resource type="PackedScene" uid="uid://ct1j5swp03c2p" path="res://entities/item/item.tscn" id="3_4717r"]
+[ext_resource type="Texture2D" uid="uid://dmkmf71bkwf8n" path="res://tiles/rock.png" id="3_h5o24"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_4717r"]
 seed = 3
@@ -16,10 +17,16 @@ texture = ExtResource("2_tcf2h")
 0:0/0 = 0
 0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mmdvd"]
+texture = ExtResource("3_h5o24")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+
 [sub_resource type="TileSet" id="TileSet_h5o24"]
 physics_layer_0/collision_layer = 1
 physics_layer_0/collision_mask = 0
 sources/0 = SubResource("TileSetAtlasSource_4717r")
+sources/1 = SubResource("TileSetAtlasSource_mmdvd")
 
 [node name="World" type="Node2D" node_paths=PackedStringArray("map")]
 script = ExtResource("1_6xmxd")
