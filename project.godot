@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="storm"
+config/name="chunk terrain"
 run/main_scene="uid://cq5aeyk33xfvo"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 boot_splash/fullsize=false
@@ -99,3 +99,4 @@ remove_tile={
 2d_physics/layer_3="foreground"
 2d_physics/layer_4="actor"
 2d_physics/layer_5="projectile"
+2d_physics/layer_16="entity"

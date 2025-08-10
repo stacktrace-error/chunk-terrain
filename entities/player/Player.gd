@@ -37,7 +37,8 @@ func _process(delta:float) -> void:
 	if cxy != last_chunk: load_chunks()
 
 func load_chunks() -> void:
-	if !(is_multiplayer_authority() or multiplayer.get_unique_id() == 1): return
+	var peer_id = multiplayer.get_unique_id()
+	if !(is_multiplayer_authority() or peer_id == 1): return
 	
 	var rnge : PackedInt32Array = range(1 - chunk_radius, chunk_radius)
 	
@@ -45,4 +46,4 @@ func load_chunks() -> void:
 	for offset_x : int in rnge: for offset_y : int in rnge:
 		offset_xy[0] = offset_x + cxy[0]
 		offset_xy[1] = offset_y + cxy[1]
-		GameWorld.send_or_generate_chunk(offset_xy)
+		GameWorld.send_or_generate_chunk(peer_id, offset_xy)

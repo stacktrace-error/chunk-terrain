@@ -7,7 +7,7 @@ class_name World
 ## Entity data and IDs.
 var entities : Dictionary[int, Entity] = {}
 ## The chunk coordinates of chunks that should be saved.
-var used_chunks : Array[Vector2i] = []
+var used_chunks : Dictionary[Vector2i, Variant] = {}
 
 const chunk_size : Vector2i = Vector2i(16, 16)
 
@@ -44,7 +44,6 @@ func load_file() -> void:
 	
 	map.clear()
 	used_chunks.clear()
-	used_chunks.resize(chunks.size())
 	
 	var i : int = 0
 	for c : String in chunks:
@@ -52,7 +51,7 @@ func load_file() -> void:
 		var cxy : Vector2i = Vector2i(arr[0], arr[1])
 		
 		deserialize_chunk_tiles(map, cxy, chunks[c]["tiles"])
-		used_chunks[i] = cxy
+		used_chunks[cxy] = null
 		i += 1
 		
 #endregion
@@ -94,11 +93,11 @@ static func deserialize_tile(tilemap:TileMapLayer, mxy:Vector2i, tile:int) -> vo
 
 
 #region networking
-func send_or_generate_chunk(cxy:Vector2i) -> void:
+func send_or_generate_chunk(peer_id:int, cxy:Vector2i) -> void:
 	if !cxy in used_chunks: 
 		generate_chunk(cxy)
 	elif multiplayer.get_unique_id() == 1:
-		send_chunk.rpc(serialize_chunk_tiles(map, cxy), cxy) ##TODO should be rpc_id()
+		send_chunk.rpc_id(peer_id, serialize_chunk_tiles(map, cxy), cxy)
 
 @rpc("authority", "call_remote", "reliable")
 func send_chunk(chunk:Array[Array], cxy:Vector2i) -> void: deserialize_chunk_tiles(map, cxy, chunk)
@@ -133,7 +132,7 @@ func generate_chunk(cxy:Vector2i) -> void:
 
 
 #region utility
-func mark_chunk_used(cxy:Vector2i) -> void: if !cxy in used_chunks: used_chunks.append(cxy)
+func mark_chunk_used(cxy:Vector2i) -> void: if !cxy in used_chunks: used_chunks[cxy] = null
 func mark_chunk_used_map(mxy:Vector2) -> void: mark_chunk_used(map_to_chunk(mxy))
 
 func map_to_chunk(mxy:Vector2) -> Vector2i: return (mxy / (chunk_size as Vector2)).floor()
