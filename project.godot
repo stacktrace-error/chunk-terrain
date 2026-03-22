@@ -8,19 +8,22 @@
 
 config_version=5
 
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
 [application]
 
 config/name="chunk terrain"
 run/main_scene="uid://cq5aeyk33xfvo"
-config/features=PackedStringArray("4.4", "GL Compatibility")
-boot_splash/fullsize=false
+config/features=PackedStringArray("4.6", "GL Compatibility")
+boot_splash/stretch_mode=0
 boot_splash/image="uid://bqyp2x4sdtnjl"
 config/icon="uid://bqyp2x4sdtnjl"
 
 [autoload]
 
 GameWorld="*res://world/world.tscn"
-Multiplayer="*res://Multiplayer.gd"
 Camera="*res://camera_2d.tscn"
 
 [debug]

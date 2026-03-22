@@ -4,12 +4,6 @@ extends Camera2D
 	#position += Input.get_vector("left", "right", "up", "down") * delta * 200
 
 func _input(event:InputEvent) -> void:
-	if event.is_action("zoom_in"):
-		set_cam_zoom(zoom.x + 0.5)
-	elif event.is_action("zoom_out"):
-		set_cam_zoom(zoom.x - 0.5)
-
-func set_cam_zoom(cam_zoom:float) -> void:
-	var z : float = clampf(cam_zoom, 0.1, 10.0)
-	zoom.x = z
-	zoom.y = z
+	var change = Input.get_axis("zoom_out", "zoom_in") * 0.2
+	if change: zoom += Vector2.ONE * change * zoom.x
+	
