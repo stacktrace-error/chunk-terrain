@@ -1,12 +1,14 @@
 [gd_scene format=3 uid="uid://cq5aeyk33xfvo"]
 
 [ext_resource type="Script" uid="uid://cgur0hsjp3hq1" path="res://Multiplayer.gd" id="1_o4y1c"]
+[ext_resource type="PackedScene" uid="uid://bxykqb7tkkh26" path="res://chat.tscn" id="2_wktud"]
 
 [node name="Multiplayer" type="CanvasLayer" unique_id=1518339262]
 script = ExtResource("1_o4y1c")
 
 [node name="NetworkPanel" type="TabContainer" parent="." unique_id=466120159]
 unique_name_in_owner = true
+visible = false
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
@@ -14,9 +16,10 @@ offset_top = -62.0
 offset_right = 287.0
 grow_vertical = 0
 size_flags_vertical = 8
-current_tab = 0
+current_tab = 1
 
-[node name="Join" type="HFlowContainer" parent="NetworkPanel" unique_id=1031464510]
+[node name="Join" type="HBoxContainer" parent="NetworkPanel" unique_id=2000473641]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -35,8 +38,7 @@ size_flags_horizontal = 0
 size_flags_vertical = 4
 text = "Confirm"
 
-[node name="Host" type="HFlowContainer" parent="NetworkPanel" unique_id=1414583024]
-visible = false
+[node name="Host" type="HBoxContainer" parent="NetworkPanel" unique_id=1105302072]
 layout_mode = 2
 metadata/_tab_index = 1
 
@@ -53,6 +55,8 @@ layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
 text = "Confirm"
+
+[node name="Chat" parent="." unique_id=1229468243 instance=ExtResource("2_wktud")]
 
 [connection signal="pressed" from="NetworkPanel/Join/JoinButton" to="." method="_on_join_button_pressed"]
 [connection signal="pressed" from="NetworkPanel/Host/HostButton" to="." method="_on_host_button_pressed"]
