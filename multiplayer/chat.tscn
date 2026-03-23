@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://bxykqb7tkkh26"]
+
+[ext_resource type="Script" uid="uid://b8rmkxyaetyh2" path="res://multiplayer/chat.gd" id="1_dg5i7"]
+
+[sub_resource type="Theme" id="Theme_adcgs"]
+
+[node name="Chat" type="Control" unique_id=1229468243]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 8
+script = ExtResource("1_dg5i7")
+
+[node name="Full" type="VBoxContainer" parent="." unique_id=859209434]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_adcgs")
+
+[node name="PanelContainer" type="PanelContainer" parent="Full" unique_id=1855594950]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Full/PanelContainer" unique_id=236989270]
+layout_mode = 2
+
+[node name="ChatText" type="RichTextLabel" parent="Full/PanelContainer/VBoxContainer" unique_id=17034090]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Press [Enter] to submit a typed message."
+scroll_following = true
+vertical_alignment = 2
+
+[node name="ChatInput" type="LineEdit" parent="Full/PanelContainer/VBoxContainer" unique_id=1401758675]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Nullevoy:"
+emoji_menu_enabled = false
+
+[node name="Spacer" type="Control" parent="Full" unique_id=226054783]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+
+[node name="Recent" type="VBoxContainer" parent="." unique_id=868314742]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 332.0
+grow_vertical = 2
+alignment = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Recent" unique_id=268930806]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="RecentChat" type="RichTextLabel" parent="Recent/PanelContainer" unique_id=1496671690]
+unique_name_in_owner = true
+layout_mode = 2
+bbcode_enabled = true
+text = "[color=gray]Press [Enter] to open or close in-game chat.[/color]"
+fit_content = true
+scroll_active = false
+vertical_alignment = 2
+
+[node name="Spacer" type="Control" parent="Recent" unique_id=1446628065]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+
+[connection signal="text_submitted" from="Full/PanelContainer/VBoxContainer/ChatInput" to="." method="_on_chat_input_text_submitted"]

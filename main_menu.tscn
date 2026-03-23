@@ -1,0 +1,56 @@
+[gd_scene format=3 uid="uid://b5lib4cfpco6n"]
+
+[ext_resource type="Script" uid="uid://y1hsvj0qhxxw" path="res://multiplayer/network_panel.gd" id="1_06t4h"]
+
+[node name="MainMenu" type="CanvasLayer" unique_id=897139959]
+
+[node name="NetworkPanel" type="TabContainer" parent="." unique_id=1558555824]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -62.0
+offset_right = 287.0
+grow_vertical = 0
+size_flags_vertical = 8
+current_tab = 0
+script = ExtResource("1_06t4h")
+
+[node name="Join" type="HBoxContainer" parent="NetworkPanel" unique_id=242613971]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="JoinAddress" type="LineEdit" parent="NetworkPanel/Join" unique_id=2027740086]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "79.222.27.225:13500"
+placeholder_text = "ex. \"127.0.0.1\""
+emoji_menu_enabled = false
+
+[node name="JoinButton" type="Button" parent="NetworkPanel/Join" unique_id=994324684]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+text = "Confirm"
+
+[node name="Host" type="HBoxContainer" parent="NetworkPanel" unique_id=401531738]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="HostPort" type="LineEdit" parent="NetworkPanel/Host" unique_id=280574990]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Enter port number..."
+emoji_menu_enabled = false
+
+[node name="HostButton" type="Button" parent="NetworkPanel/Host" unique_id=1110564422]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+text = "Confirm"

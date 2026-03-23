@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://c6pcef58g4kj8"]
+
+[ext_resource type="Script" uid="uid://c56tjy1goa57h" path="res://multiplayer/ping_marker.gd" id="1_k3rbl"]
+
+[node name="PingMarker" type="Node2D" unique_id=983919406]
+top_level = true
+script = ExtResource("1_k3rbl")
+
+[node name="Circle" type="Line2D" parent="." unique_id=1926631243]
+unique_name_in_owner = true
+points = PackedVector2Array(0, -50, 50, 0, 0, 50, -50, 0)
+closed = true
+default_color = Color(0, 0, 0, 1)
+joint_mode = 2
+
+[node name="CircleColor" type="Line2D" parent="Circle" unique_id=1773823837]
+unique_name_in_owner = true
+points = PackedVector2Array(0, -50, 50, 0, 0, 50, -50, 0)
+closed = true
+width = 5.0
+default_color = Color(0.97503024, 0.77336687, 0, 1)
+joint_mode = 2
+
+[node name="Text" type="RichTextLabel" parent="." unique_id=2011128395]
+unique_name_in_owner = true
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -250.0
+offset_top = -72.0
+offset_right = 250.0
+offset_bottom = -22.0
+grow_horizontal = 2
+grow_vertical = 0
+pivot_offset_ratio = Vector2(0.5, 1)
+theme_override_constants/outline_size = 8
+bbcode_enabled = true
+text = "[color=gray]Nullevoy"
+fit_content = true
+scroll_active = false
+horizontal_alignment = 1
+vertical_alignment = 2
