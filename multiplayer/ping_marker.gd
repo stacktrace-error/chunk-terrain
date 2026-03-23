@@ -27,4 +27,4 @@ func setup(player:int, g_pos:Vector2, radius:float=-1, lifetime:float=20) -> voi
 	var tween : Tween = create_tween()
 	tween.tween_interval(lifetime - fade_time)
 	tween.tween_property(self, "modulate", Color.TRANSPARENT, fade_time)
-	tween.tween_callback(free)
+	tween.tween_callback(self.free)

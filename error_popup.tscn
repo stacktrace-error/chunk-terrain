@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://dvgqqshnkxor2"]
+
+[ext_resource type="Script" uid="uid://duunnjq16pdkk" path="res://error_popup.gd" id="1_ppttv"]
+
+[node name="ErrorPopup" type="Popup" unique_id=2017685428]
+oversampling_override = 1.0
+title = "Wuh oh! Fucky wucky!!!!!!"
+initial_position = 4
+size = Vector2i(400, 286)
+visible = true
+borderless = false
+always_on_top = true
+script = ExtResource("1_ppttv")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1170976739]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=537252516]
+layout_mode = 2
+
+[node name="ErrorText" type="RichTextLabel" parent="PanelContainer/VBoxContainer" unique_id=2044163064]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "wu oh! fucky wucky!!!!"
+fit_content = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer" unique_id=79514883]
+layout_mode = 2
+alignment = 2
+
+[node name="Accept" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1205081831]
+layout_mode = 2
+text = "Accept"
+
+[node name="Cancel" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1938231566]
+layout_mode = 2
+text = "Bargain"
+
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/Accept" to="." method="hide"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/Cancel" to="PanelContainer/VBoxContainer/ErrorText" method="set_text" binds= ["You try to bargain, but receive nothing."]]

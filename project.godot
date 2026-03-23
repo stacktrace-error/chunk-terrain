@@ -29,6 +29,7 @@ Multiplayer="*uid://cgur0hsjp3hq1"
 Camera="*res://camera_2d.tscn"
 HUD="*uid://ct0cs4hrv60t6"
 PingMarkers="*uid://crbgw6ct16osm"
+ErrorPopup="*uid://dvgqqshnkxor2"
 
 [debug]
 
