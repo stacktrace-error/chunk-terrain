@@ -14,7 +14,7 @@ const max_recent : int = 7
 const recent_fade_time : float = 10
 
 func _ready() -> void:
-	show_recent()
+	Multiplayer.game_started.connect(show)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("chat"): full = !full

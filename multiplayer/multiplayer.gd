@@ -1,7 +1,7 @@
 extends Node
 
+signal game_started
 signal hosted
-
 signal connection_status_changed(to:MultiplayerPeer.ConnectionStatus)
 
 const default_port : int = 13500
@@ -36,6 +36,7 @@ func host(port:int=default_port) -> void:
 			
 			DisplayServer.window_set_title.call_deferred("hosting")
 			hosted.emit()
+			game_started.emit()
 
 
 func join_parse_port(address:String) -> void:
@@ -51,7 +52,9 @@ func join(address:String="localhost", port:int=default_port) -> void:
 		ERR_ALREADY_IN_USE: ErrorPopup.show_with("Multiplayer peer already in use.")
 		OK:
 			multiplayer.multiplayer_peer = peer
-			DisplayServer.window_set_title.call_deferred("joined")
+			DisplayServer.window_set_title.call_deferred("joining")
+			multiplayer.connected_to_server.connect(game_started.emit)
+			
 
 
 func add_player(id : int = 1) -> void:

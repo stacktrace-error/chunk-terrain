@@ -1,8 +1,7 @@
 extends Control
 
 func _ready() -> void:
-	Multiplayer.hosted.connect(hide)
-	multiplayer.connected_to_server.connect(hide)
+	Multiplayer.game_started.connect(hide)
 	
 	var args : Dictionary[String, String] = Util.launch_args
 	if "host" in args: Multiplayer.host_parse_port(args["host"])
@@ -14,7 +13,7 @@ func _on_host_submit() -> void:
 func _on_join_submit() -> void:
 	Multiplayer.join_parse_port(%JoinAddress.text)
 
-func update_status(status:MultiplayerPeer.ConnectionStatus):
+func update_status(status:MultiplayerPeer.ConnectionStatus) -> void:
 	%StatusText.show()
 	match status:
 		MultiplayerPeer.CONNECTION_DISCONNECTED: %StatusText.text = "Not Connected."
