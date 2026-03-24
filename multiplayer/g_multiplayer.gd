@@ -4,16 +4,16 @@ signal game_started
 signal hosted
 signal connection_status_changed(to:MultiplayerPeer.ConnectionStatus)
 
-const default_port : int = 13500
-
 var peer : ENetMultiplayerPeer = ENetMultiplayerPeer.new()
-
 var connection_status : MultiplayerPeer.ConnectionStatus:
 	set(x):
 		if(connection_status != x):
 			connection_status = x
 			connection_status_changed.emit(x)
 
+var players : Dictionary[int, Player]
+
+const default_port : int = 13500
 
 func _process(_delta: float) -> void:
 	var p : MultiplayerPeer = multiplayer.multiplayer_peer
@@ -58,7 +58,18 @@ func join(address:String="localhost", port:int=default_port) -> void:
 			multiplayer.connected_to_server.connect(func()->void:DisplayServer.window_set_title(str(address, ":", port)))
 			
 
-func add_player(id : int = 1) -> void:
+func add_player(id:int=1) -> void:
+	if Surfaces.active_surface == null:
+		players[id] = null
+		Surfaces.loaded.connect(spawn_player.bind(id), CONNECT_ONE_SHOT)
+	else: 
+		spawn_player(id)
+
+func spawn_player(id:int) -> void:
+	if players.get(id, null):
+		print("attempted to spawn duplicate brain for " + str(id))
+		return
 	var player : Player = preload("res://multiplayer/player.tscn").instantiate()
 	player.name = str("Player ", id)
+	players[id] = player
 	add_child(player)

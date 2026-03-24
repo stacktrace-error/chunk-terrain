@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://j414tyh02c3j"]
+
+[ext_resource type="Script" uid="uid://chrbc5l76vv4t" path="res://entities/warper.gd" id="1_rl81a"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rl81a"]
+size = Vector2(500, 500)
+
+[node name="Warper" type="Area2D" unique_id=1291180876]
+collision_mask = 32768
+script = ExtResource("1_rl81a")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=432629516]
+shape = SubResource("RectangleShape2D_rl81a")

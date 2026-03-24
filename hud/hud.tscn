@@ -4,13 +4,16 @@
 [ext_resource type="Script" uid="uid://c5csrau036sho" path="res://hud/hud.gd" id="1_64ctp"]
 [ext_resource type="Script" uid="uid://bajpfjqai12ds" path="res://hud/warp_panel.gd" id="3_8sq4i"]
 
-[node name="HUD" type="CanvasLayer" unique_id=980792172]
+[node name="HUD" type="CanvasLayer" unique_id=980792172 node_paths=PackedStringArray("warp_button")]
 script = ExtResource("1_64ctp")
+warp_button = NodePath("WarpPanel/PanelContainer/HBoxContainer/WarpButton")
 
 [node name="Chat" parent="." unique_id=1229468243 instance=ExtResource("1_37p78")]
+unique_name_in_owner = true
 visible = true
 
 [node name="WarpPanel" type="Control" parent="." unique_id=1126592842]
+unique_name_in_owner = true
 layout_mode = 3
 anchors_preset = 0
 offset_right = 370.0
@@ -28,4 +31,5 @@ layout_mode = 2
 [node name="WarpButton" type="Button" parent="WarpPanel/PanelContainer/HBoxContainer" unique_id=1879929731]
 unique_name_in_owner = true
 layout_mode = 2
+focus_mode = 0
 text = "Warp!"

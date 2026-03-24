@@ -1,10 +1,14 @@
 extends CharacterBody2D
 class_name PlayerBody
 
+signal surface_changed(surface:Surface)
 
-var surface : Surface
+var surface : Surface:
+	set(x):
+		if surface != x:
+			surface = x
+			surface_changed.emit(x)
 var cxy : Vector2i
-
 
 const chunk_radius : int = 8
 

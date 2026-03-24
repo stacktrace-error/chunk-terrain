@@ -1,4 +1,4 @@
-extends Control
+class_name Chat extends Control
 
 var full : bool = false:
 	set(x):
