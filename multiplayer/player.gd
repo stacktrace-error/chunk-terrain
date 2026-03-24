@@ -3,7 +3,9 @@ class_name Player extends Node
 var body : PlayerBody
 
 func _ready() -> void:
-	set_multiplayer_authority(name.trim_prefix("Player ").to_int())
+	var id : int = name.trim_prefix("Player ").to_int()
+	set_multiplayer_authority(id)
+	HUD.chat.add_message(str("[color=yellow]", id, " has connected.[/color]"))
 	spawn_body()
 
 func spawn_body() -> void:

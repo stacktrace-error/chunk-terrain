@@ -11,7 +11,6 @@ var active_surface : Surface:
 			active_surface.collision_enabled = false
 			active_surface.hide()
 		active_surface = x
-		spawn_point = x
 		x.collision_enabled = true
 		x.show()
 
@@ -22,6 +21,7 @@ func on_game_start() -> void:
 	set_active_surface(create_surface(3))
 	
 	warper = load("res://entities/warper.tscn").instantiate()
+	spawn_point = warper
 	active_surface.add_child.call_deferred(warper)
 	
 	loaded.emit()

@@ -34,10 +34,11 @@ func show_recent() -> void:
 
 @rpc("any_peer", "call_local")
 func send_message(player:int, message:String) -> void:
-	var final : String = str("[color=gray]", player, "[/color]: ", message)
-	
+	add_message(str("[color=gray]", player, "[/color]: ", message))
+
+func add_message(message:String) -> void:
 	if recent.size() >= max_recent: recent.pop_front()
-	recent.append(final)
+	recent.append(message)
 	
 	%RecentChat.clear()
 	var br : String = ""
@@ -45,7 +46,7 @@ func send_message(player:int, message:String) -> void:
 		%RecentChat.append_text(br + line)
 		br = "\n"
 	
-	%ChatText.append_text("\n" + final)
+	%ChatText.append_text("\n" + message)
 	show_recent()
 
 func _on_chat_input_text_submitted(new_text: String) -> void:
