@@ -1,6 +1,15 @@
 class_name WarpPanel extends Control
 
-
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	pass # Replace with function body.
+	Surfaces.loaded.connect(setup)
+
+func setup() -> void:
+	if is_multiplayer_authority():
+		%WarpButton.pressed.connect(Surfaces.warper.start_warp)
+	else:
+		%WarpButton.text = "Request warp"
+		%WarpButton.pressed.connect(func()->void:
+			HUD.chat.send_anonymous_message(
+				str("[color=yellow]", multiplayer.get_unique_id(), " would like to warp.[/color]")
+			)
+		)

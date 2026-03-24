@@ -32,9 +32,15 @@ func show_recent() -> void:
 	fade_tween.tween_property(%Recent, "modulate", Color.TRANSPARENT, recent_fade_time)
 	fade_tween.tween_callback(%Recent.hide)
 
-@rpc("any_peer", "call_local")
 func send_message(player:int, message:String) -> void:
-	add_message(str("[color=gray]", player, "[/color]: ", message))
+	rpc_msg.rpc(str("[color=gray]", player, "[/color]: ", message))
+
+func send_anonymous_message(message:String) -> void:
+	rpc_msg.rpc(message)
+
+@rpc("any_peer", "call_local")
+func rpc_msg(message:String) -> void:
+	add_message(message)
 
 func add_message(message:String) -> void:
 	if recent.size() >= max_recent: recent.pop_front()

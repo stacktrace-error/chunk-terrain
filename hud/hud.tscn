@@ -29,6 +29,7 @@ offset_bottom = 40.0
 layout_mode = 2
 
 [node name="WarpButton" type="Button" parent="WarpPanel/PanelContainer/HBoxContainer" unique_id=1879929731]
+unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "Warp!"
