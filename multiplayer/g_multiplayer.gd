@@ -11,7 +11,7 @@ var connection_status : MultiplayerPeer.ConnectionStatus:
 			connection_status = x
 			connection_status_changed.emit(x)
 
-var players : Dictionary[int, Player]
+var players : Dictionary[int, Player] = {}
 
 const default_port : int = 13500
 
@@ -73,3 +73,6 @@ func spawn_player(id:int) -> void:
 	player.name = str("Player ", id)
 	players[id] = player
 	add_child(player)
+
+func get_player() -> Player:
+	return players.get(multiplayer.get_unique_id(), null)

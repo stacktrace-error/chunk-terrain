@@ -5,16 +5,18 @@ var full : bool = false:
 		full = x
 		%Full.visible = x
 		%Recent.visible = !x
-		if full: %ChatInput.grab_focus()
+		if full: 
+			%ChatInput.grab_focus()
+			%ChatInput.placeholder_text = Multiplayer.get_player().nickname + ":"
 
-var recent : Array[String] = ["[color=gray]Press [Enter] to open or close in-game chat.[/color]"]
+var recent : Array[String] = [tr(&"chat_hint_open")]
 var fade_tween : Tween
 
 const max_recent : int = 7
 const recent_fade_time : float = 10
 
 func _ready() -> void:
-	Multiplayer.game_started.connect(show_recent)
+	Surfaces.loaded.connect(show_recent)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("chat"): 
@@ -33,13 +35,14 @@ func show_recent() -> void:
 	fade_tween.tween_callback(%Recent.hide)
 
 func send_message(player:int, message:String) -> void:
-	rpc_msg.rpc(str("[color=gray]", player, "[/color]: ", message))
+	rpc_msg.rpc(str(Multiplayer.players[player].get_colored_name(), ": ", message))
 
-func send_anonymous_message(message:String) -> void:
+func send_unsigned_message(message:String) -> void:
 	rpc_msg.rpc(message)
 
 @rpc("any_peer", "call_local")
 func rpc_msg(message:String) -> void:
+	multiplayer.get_remote_sender_id()
 	add_message(message)
 
 func add_message(message:String) -> void:
@@ -57,7 +60,7 @@ func add_message(message:String) -> void:
 
 func _on_chat_input_text_submitted(new_text: String) -> void:
 	if new_text != "":
-		send_message.rpc(multiplayer.get_unique_id(), new_text)
+		send_message(multiplayer.get_unique_id(), new_text)
 	
 	%ChatInput.clear()
 	full = false

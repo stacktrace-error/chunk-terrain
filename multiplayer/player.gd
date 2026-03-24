@@ -1,11 +1,13 @@
 class_name Player extends Node
 
+var nickname : String
+var color : Color = Color.GRAY
 var body : PlayerBody
 
 func _ready() -> void:
 	var id : int = name.trim_prefix("Player ").to_int()
 	set_multiplayer_authority(id)
-	HUD.chat.add_message(str("[color=yellow]", id, " has connected.[/color]"))
+	HUD.chat.add_message(tr("msg_player_connected") % nickname)
 	spawn_body()
 
 func spawn_body() -> void:
@@ -20,3 +22,6 @@ func spawn_body() -> void:
 	if is_multiplayer_authority(): Camera.target = body
 	
 	Surfaces.spawn_point.add_child(body)
+
+func get_colored_name() -> String:
+	return str("[color=", color, "]", nickname, "[/color]")

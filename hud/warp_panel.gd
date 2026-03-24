@@ -9,7 +9,7 @@ func setup() -> void:
 	else:
 		%WarpButton.text = "Request warp"
 		%WarpButton.pressed.connect(func()->void:
-			HUD.chat.send_anonymous_message(
-				str("[color=yellow]", multiplayer.get_unique_id(), " would like to warp.[/color]")
+			HUD.chat.send_unsigned_message(
+				tr(&"msg_request_warp") % multiplayer.get_unique_id()
 			)
 		)

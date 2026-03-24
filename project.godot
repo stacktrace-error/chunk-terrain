@@ -111,6 +111,11 @@ ping={
 ]
 }
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://assets/localization/locale.de.translation", "res://assets/localization/locale.en.translation")
+locale/test="de"
+
 [layer_names]
 
 2d_physics/layer_1="collision"
