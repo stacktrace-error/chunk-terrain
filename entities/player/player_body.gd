@@ -1,17 +1,15 @@
 extends CharacterBody2D
-class_name Player
+class_name PlayerBody
 
+
+var surface : Surface
 var cxy : Vector2i
+
 
 const chunk_radius : int = 8
 
 func _enter_tree() -> void:
-	set_multiplayer_authority(name.trim_prefix("Player ").to_int())
-	if is_multiplayer_authority():
-		Camera.reparent(self, false)
-	
-	if multiplayer.get_unique_id() != 1: GameWorld.map.clear()
-	
+	surface = Surfaces.get_parent_surface(self)
 	load_chunks()
 
 func _process(delta:float) -> void:
@@ -26,18 +24,18 @@ func _process(delta:float) -> void:
 			velocity.y = 1000
 		
 		if Input.is_action_pressed("place_tile"):
-			GameWorld.place_tile.rpc(GameWorld.global_to_map(get_global_mouse_position()))
+			surface.place_tile.rpc(surface.global_to_map(get_global_mouse_position()))
 		elif Input.is_action_pressed("remove_tile"):
-			GameWorld.remove_tile.rpc(GameWorld.global_to_map(get_global_mouse_position()))
+			surface.remove_tile.rpc(surface.global_to_map(get_global_mouse_position()))
 	
 	move_and_slide()
 	
 	var last_chunk : Vector2i = cxy
-	cxy	= GameWorld.global_to_chunk(global_position)
+	cxy	= surface.global_to_chunk(global_position)
 	if cxy != last_chunk: load_chunks()
 
 func load_chunks() -> void:
-	var peer_id = multiplayer.get_unique_id()
+	var peer_id : int = multiplayer.get_unique_id()
 	if !(is_multiplayer_authority() or peer_id == 1): return
 	
 	var rnge : PackedInt32Array = range(1 - chunk_radius, chunk_radius)
@@ -46,4 +44,4 @@ func load_chunks() -> void:
 	for offset_x : int in rnge: for offset_y : int in rnge:
 		offset_xy[0] = offset_x + cxy[0]
 		offset_xy[1] = offset_y + cxy[1]
-		GameWorld.send_or_generate_chunk(peer_id, offset_xy)
+		surface.send_or_generate_chunk(peer_id, offset_xy)

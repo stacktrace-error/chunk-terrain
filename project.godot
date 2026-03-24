@@ -24,9 +24,9 @@ config/icon="uid://bqyp2x4sdtnjl"
 [autoload]
 
 Util="*uid://b1ox2g36gt0oq"
-GameWorld="*res://world/world.tscn"
-Multiplayer="*uid://cgur0hsjp3hq1"
-Camera="*res://camera_2d.tscn"
+Surfaces="*uid://cotemipcvisqa"
+Multiplayer="*uid://cq5aeyk33xfvo"
+Camera="*res://g_camera.tscn"
 HUD="*uid://ct0cs4hrv60t6"
 PingMarkers="*uid://crbgw6ct16osm"
 ErrorPopup="*uid://dvgqqshnkxor2"

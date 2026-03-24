@@ -7,7 +7,6 @@ signal connection_status_changed(to:MultiplayerPeer.ConnectionStatus)
 const default_port : int = 13500
 
 var peer : ENetMultiplayerPeer = ENetMultiplayerPeer.new()
-var player_scene : PackedScene = load("res://entities/player/player.tscn")
 
 var connection_status : MultiplayerPeer.ConnectionStatus:
 	set(x):
@@ -15,9 +14,11 @@ var connection_status : MultiplayerPeer.ConnectionStatus:
 			connection_status = x
 			connection_status_changed.emit(x)
 
+
 func _process(_delta: float) -> void:
 	var p : MultiplayerPeer = multiplayer.multiplayer_peer
 	if p and !multiplayer.is_server(): connection_status = p.get_connection_status()
+
 
 func host_parse_port(port_string:String="") -> void:
 	var port : int = default_port
@@ -54,10 +55,10 @@ func join(address:String="localhost", port:int=default_port) -> void:
 			multiplayer.multiplayer_peer = peer
 			DisplayServer.window_set_title.call_deferred("joining")
 			multiplayer.connected_to_server.connect(game_started.emit)
+			multiplayer.connected_to_server.connect(func()->void:DisplayServer.window_set_title(str(address, ":", port)))
 			
 
-
 func add_player(id : int = 1) -> void:
-	var player : Player = player_scene.instantiate()
+	var player : Player = preload("res://multiplayer/player.tscn").instantiate()
 	player.name = str("Player ", id)
-	GameWorld.add_child.call_deferred(player)
+	add_child(player)

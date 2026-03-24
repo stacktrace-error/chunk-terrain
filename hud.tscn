@@ -1,7 +1,0 @@
-[gd_scene format=3 uid="uid://ct0cs4hrv60t6"]
-
-[ext_resource type="PackedScene" uid="uid://bxykqb7tkkh26" path="res://multiplayer/chat.tscn" id="1_37p78"]
-
-[node name="HUD" type="CanvasLayer" unique_id=980792172]
-
-[node name="Chat" parent="." unique_id=1229468243 instance=ExtResource("1_37p78")]

@@ -1,13 +1,12 @@
 [gd_scene format=3 uid="uid://dvgqqshnkxor2"]
 
-[ext_resource type="Script" uid="uid://duunnjq16pdkk" path="res://error_popup.gd" id="1_ppttv"]
+[ext_resource type="Script" uid="uid://duunnjq16pdkk" path="res://g_error_popup.gd" id="1_ppttv"]
 
 [node name="ErrorPopup" type="Popup" unique_id=2017685428]
 oversampling_override = 1.0
 title = "Wuh oh! Fucky wucky!!!!!!"
 initial_position = 4
-size = Vector2i(400, 286)
-visible = true
+size = Vector2i(400, 461)
 borderless = false
 always_on_top = true
 script = ExtResource("1_ppttv")

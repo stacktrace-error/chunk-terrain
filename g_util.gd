@@ -21,7 +21,7 @@ func _ready() -> void:
 			var value : String = ""
 			
 			if arg.contains("="): 
-				var split = arg.split("=", false, 1)
+				var split : PackedStringArray = arg.split("=", false, 1)
 				key = split[0]
 				value = split[1]
 
