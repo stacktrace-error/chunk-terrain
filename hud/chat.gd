@@ -42,7 +42,7 @@ func send_unsigned_message(message:String) -> void:
 
 @rpc("any_peer", "call_local")
 func rpc_msg(message:String) -> void:
-	multiplayer.get_remote_sender_id()
+	#multiplayer.get_remote_sender_id()
 	add_message(message)
 
 func add_message(message:String) -> void:

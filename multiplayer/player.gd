@@ -1,14 +1,22 @@
 class_name Player extends Node
 
-var nickname : String
+var id : int
+var nickname : String:
+	get:
+		if id == 1: return "Nullevoy"
+		return "fuckass bum"
 var color : Color = Color.GRAY
 var body : PlayerBody
 
 func _ready() -> void:
-	var id : int = name.trim_prefix("Player ").to_int()
+	id = name.to_int()
 	set_multiplayer_authority(id)
 	HUD.chat.add_message(tr("msg_player_connected") % nickname)
-	spawn_body()
+	
+	if Surfaces.active_surface == null:
+		Surfaces.loaded.connect(spawn_body, CONNECT_ONE_SHOT)
+	else: 
+		spawn_body()
 
 func spawn_body() -> void:
 	if body: return
@@ -24,4 +32,4 @@ func spawn_body() -> void:
 	Surfaces.spawn_point.add_child(body)
 
 func get_colored_name() -> String:
-	return str("[color=", color, "]", nickname, "[/color]")
+	return str("[color=#", color.to_html(false), "]", nickname, "[/color]")

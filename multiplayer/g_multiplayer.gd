@@ -32,8 +32,8 @@ func host(port:int=default_port) -> void:
 		ERR_ALREADY_IN_USE: ErrorPopup.show_with("Multiplayer peer already in use.")
 		OK:
 			multiplayer.multiplayer_peer = peer
-			multiplayer.peer_connected.connect(add_player)
-			add_player()
+			multiplayer.peer_connected.connect(on_peer_connected)
+			on_peer_connected(1)
 			
 			DisplayServer.window_set_title.call_deferred("hosting")
 			hosted.emit()
@@ -58,19 +58,19 @@ func join(address:String="localhost", port:int=default_port) -> void:
 			multiplayer.connected_to_server.connect(func()->void:DisplayServer.window_set_title(str(address, ":", port)))
 			
 
-func add_player(id:int=1) -> void:
-	if Surfaces.active_surface == null:
-		players[id] = null
-		Surfaces.loaded.connect(spawn_player.bind(id), CONNECT_ONE_SHOT)
-	else: 
-		spawn_player(id)
+func on_peer_connected(id:int) -> void:
+	if !players.is_empty():
+		for player : int in players:
+			rpc_add_player.rpc_id(id, player)
+	rpc_add_player.rpc(id)
 
-func spawn_player(id:int) -> void:
+@rpc("authority", "call_local")
+func rpc_add_player(id:int) -> void:
 	if players.get(id, null):
 		print("attempted to spawn duplicate brain for " + str(id))
 		return
 	var player : Player = preload("res://multiplayer/player.tscn").instantiate()
-	player.name = str("Player ", id)
+	player.name = str(id)
 	players[id] = player
 	add_child(player)
 

@@ -28,9 +28,9 @@ func _process(delta:float) -> void:
 			velocity.y = 1000
 		
 		if Input.is_action_pressed("place_tile"):
-			surface.place_tile.rpc(surface.global_to_map(get_global_mouse_position()))
+			surface.rpc_place_tile.rpc(surface.global_to_map(get_global_mouse_position()))
 		elif Input.is_action_pressed("remove_tile"):
-			surface.remove_tile.rpc(surface.global_to_map(get_global_mouse_position()))
+			surface.rpc_remove_tile.rpc(surface.global_to_map(get_global_mouse_position()))
 	
 	move_and_slide()
 	

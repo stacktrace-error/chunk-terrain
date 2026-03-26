@@ -90,22 +90,22 @@ func send_or_generate_chunk(peer_id:int, cxy:Vector2i) -> void:
 	if !cxy in used_chunks: 
 		generate_chunk(cxy)
 	elif multiplayer.get_unique_id() == 1 && peer_id != 1:
-		send_chunk.rpc_id(peer_id, serialize_chunk_tiles(cxy), cxy)
+		rpc_send_chunk.rpc_id(peer_id, serialize_chunk_tiles(cxy), cxy)
 
 @rpc("authority", "call_remote", "reliable")
-func send_chunk(chunk:Array[Array], cxy:Vector2i) -> void: deserialize_chunk_tiles(cxy, chunk)
+func rpc_send_chunk(chunk:Array[Array], cxy:Vector2i) -> void: deserialize_chunk_tiles(cxy, chunk)
 
 
 ##TODO send only to players who are loading these chunks
 ##TODO send serialized tile
 @rpc("any_peer", "call_local", "reliable")
-func place_tile(mxy:Vector2i) -> void:
+func rpc_place_tile(mxy:Vector2i) -> void:
 	set_cell(mxy, 1, Vector2i.ZERO)
 	mark_chunk_used_map(mxy)
 
 ##TODO send only to players who are loading these chunks
 @rpc("any_peer", "call_local", "reliable")
-func remove_tile(mxy:Vector2i) -> void:
+func rpc_remove_tile(mxy:Vector2i) -> void:
 	erase_cell(mxy)
 	mark_chunk_used_map(mxy)
 #endregion
