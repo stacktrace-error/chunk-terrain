@@ -1,7 +1,7 @@
 extends Control
 
 func _ready() -> void:
-	Multiplayer.game_started.connect(hide)
+	Multiplayer.player_ready.connect(hide)
 	
 	var args : Dictionary[String, String] = Util.launch_args
 	if "host" in args: Multiplayer.host_parse_port(args["host"])

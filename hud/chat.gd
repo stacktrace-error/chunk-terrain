@@ -2,12 +2,14 @@ class_name Chat extends Control
 
 var full : bool = false:
 	set(x):
+		if x:
+			var p : Player = Multiplayer.get_player()
+			if !p: return # Cannot open chat if not in a game.
+			%ChatInput.grab_focus()
+			%ChatInput.placeholder_text = p.nickname + ":"
 		full = x
 		%Full.visible = x
 		%Recent.visible = !x
-		if full: 
-			%ChatInput.grab_focus()
-			%ChatInput.placeholder_text = Multiplayer.get_player().nickname + ":"
 
 var recent : Array[String] = [tr(&"chat_hint_open")]
 var fade_tween : Tween
@@ -16,7 +18,7 @@ const max_recent : int = 7
 const recent_fade_time : float = 10
 
 func _ready() -> void:
-	Surfaces.loaded.connect(show_recent)
+	Multiplayer.player_ready.connect(show_recent)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("chat"): 

@@ -5,5 +5,6 @@ extends CanvasLayer
 @export var warp_button : Button
 
 func _ready() -> void:
-	hide()
-	Multiplayer.game_started.connect(show)
+	for child : Control in get_children():
+		child.hide()
+	Multiplayer.player_ready.connect(chat.show)
