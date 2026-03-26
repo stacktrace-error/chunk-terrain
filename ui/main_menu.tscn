@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b5lib4cfpco6n"]
 
-[ext_resource type="Script" uid="uid://y1hsvj0qhxxw" path="res://multiplayer/network_panel.gd" id="1_06t4h"]
+[ext_resource type="Script" uid="uid://y1hsvj0qhxxw" path="res://ui/lobby_start_panel.gd" id="1_06t4h"]
 
 [node name="MainMenu" type="CanvasLayer" unique_id=897139959]
 

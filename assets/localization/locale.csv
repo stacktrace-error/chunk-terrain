@@ -2,7 +2,7 @@ keys,en,de
 chat_hint_open,[color=gray]Press [Enter] to open or close in-game chat.[/color],[color=gray]Öffne/schließe das Chat-Fenster mit [Enter].[/color]
 chat_hint_send,[color=gray]Press [Enter] to submit a typed message.[/color],[color=gray]Drücke [Enter] um eine geschriebene Nachricht zu senden.[/color]
 msg_player_connected,[color=yellow]%s has connected.[/color],[color=yellow]%s ist beigetreten.[/color]
-msg_player_left,[color=yellow]%s has left.[/color],[color=yellow]%s hat das Spiel verlassen.[/color]
+msg_player_disconnected,[color=yellow]%s has left.[/color],[color=yellow]%s hat das Spiel verlassen.[/color]
 msg_request_warp,[color=yellow]%s would like to warp.[/color],
 ,,
 ,,

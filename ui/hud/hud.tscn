@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://ct0cs4hrv60t6"]
 
-[ext_resource type="PackedScene" uid="uid://bxykqb7tkkh26" path="res://hud/chat.tscn" id="1_37p78"]
-[ext_resource type="Script" uid="uid://c5csrau036sho" path="res://hud/hud.gd" id="1_64ctp"]
-[ext_resource type="Script" uid="uid://bajpfjqai12ds" path="res://hud/warp_panel.gd" id="3_8sq4i"]
+[ext_resource type="PackedScene" uid="uid://bxykqb7tkkh26" path="res://ui/hud/chat.tscn" id="1_37p78"]
+[ext_resource type="Script" uid="uid://c5csrau036sho" path="res://ui/hud/hud.gd" id="1_64ctp"]
+[ext_resource type="Script" uid="uid://bajpfjqai12ds" path="res://ui/hud/warp_panel.gd" id="3_8sq4i"]
 
 [node name="HUD" type="CanvasLayer" unique_id=980792172 node_paths=PackedStringArray("warp_button")]
 script = ExtResource("1_64ctp")
@@ -10,7 +10,6 @@ warp_button = NodePath("WarpPanel/PanelContainer/HBoxContainer/WarpButton")
 
 [node name="Chat" parent="." unique_id=1229468243 instance=ExtResource("1_37p78")]
 unique_name_in_owner = true
-visible = true
 
 [node name="WarpPanel" type="Control" parent="." unique_id=1126592842]
 unique_name_in_owner = true

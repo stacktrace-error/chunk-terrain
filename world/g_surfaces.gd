@@ -15,7 +15,7 @@ var active_surface : Surface:
 		x.show()
 
 func _ready() -> void:
-	Multiplayer.game_started.connect(on_game_start)
+	Lobby.game_started.connect(on_game_start)
 
 func on_game_start() -> void:
 	set_active_surface(create_surface(3))

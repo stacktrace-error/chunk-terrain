@@ -14,7 +14,7 @@ func _ready() -> void:
 	HUD.chat.add_message(tr("msg_player_connected") % nickname)
 	
 	if is_multiplayer_authority():
-		Multiplayer.player_ready.emit()
+		Lobby.player_ready.emit()
 	
 	if Surfaces.active_surface == null:
 		Surfaces.loaded.connect(spawn_body, CONNECT_ONE_SHOT)
@@ -36,3 +36,9 @@ func spawn_body() -> void:
 
 func get_colored_name() -> String:
 	return str("[color=", color.to_html(false), "]", nickname, "[/color]")
+
+#TODO temporary
+func free() -> void:
+	HUD.chat.add_message(tr("msg_player_disconnected") % nickname)
+	body.free()
+	super.free()

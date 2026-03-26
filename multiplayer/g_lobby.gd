@@ -1,6 +1,7 @@
 extends Node
 
 signal game_started
+@warning_ignore("unused_signal")
 signal player_ready
 signal connection_status_changed(to:MultiplayerPeer.ConnectionStatus)
 
@@ -36,6 +37,7 @@ func host(port:int=default_port) -> void:
 			multiplayer.peer_connected.connect(on_peer_connected)
 			on_peer_connected(1)
 			
+			# This could be on a button, but that's not needed right now
 			rpc_start_game.rpc()
 			
 			DisplayServer.window_set_title.call_deferred("hosting")
@@ -67,22 +69,35 @@ func on_peer_connected(id:int) -> void:
 	
 	if has_started: rpc_start_game.rpc_id(id)
 
-@rpc("authority", "call_local")
+@rpc("call_local")
 func rpc_add_player(id:int) -> void:
 	if players.get(id, null):
 		print("attempted to spawn duplicate brain for " + str(id))
 		return
-	var player : Player = preload("res://multiplayer/player.tscn").instantiate()
+	
+	var player : Player = Player.new()
 	player.name = str(id)
 	players[id] = player
 	add_child(player)
 
 
-@rpc("authority", "call_local")
+func quit() -> void:
+	if multiplayer.get_unique_id() == 1:
+		pass
+	else:
+		rpc_ask_quit.rpc_id(1)
+
+
+@rpc("any_peer")
+func rpc_ask_quit() -> void:
+	peer.disconnect_peer(multiplayer.get_remote_sender_id())
+
+
+@rpc("call_local")
 func rpc_start_game() -> void:
 	has_started = true
 	game_started.emit()
 
 
-func get_player() -> Player:
+func local_player() -> Player:
 	return players.get(multiplayer.get_unique_id(), null)

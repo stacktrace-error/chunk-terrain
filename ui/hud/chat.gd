@@ -3,7 +3,7 @@ class_name Chat extends Control
 var full : bool = false:
 	set(x):
 		if x:
-			var p : Player = Multiplayer.get_player()
+			var p : Player = Lobby.local_player()
 			if !p: return # Cannot open chat if not in a game.
 			%ChatInput.grab_focus()
 			%ChatInput.placeholder_text = p.nickname + ":"
@@ -18,7 +18,7 @@ const max_recent : int = 7
 const recent_fade_time : float = 10
 
 func _ready() -> void:
-	Multiplayer.player_ready.connect(show_recent)
+	Lobby.player_ready.connect(show_recent)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("chat"): 
@@ -37,7 +37,7 @@ func show_recent() -> void:
 	fade_tween.tween_callback(%Recent.hide)
 
 func send_message(player:int, message:String) -> void:
-	rpc_msg.rpc(str(Multiplayer.players[player].get_colored_name(), ": ", message))
+	rpc_msg.rpc(str(Lobby.players[player].get_colored_name(), ": ", message))
 
 func send_unsigned_message(message:String) -> void:
 	rpc_msg.rpc(message)

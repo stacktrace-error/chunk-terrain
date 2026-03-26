@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bxykqb7tkkh26"]
 
-[ext_resource type="Script" uid="uid://b8rmkxyaetyh2" path="res://hud/chat.gd" id="1_dg5i7"]
+[ext_resource type="Script" uid="uid://b8rmkxyaetyh2" path="res://ui/hud/chat.gd" id="1_dg5i7"]
 
 [sub_resource type="Theme" id="Theme_adcgs"]
 

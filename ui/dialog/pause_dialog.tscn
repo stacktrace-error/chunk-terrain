@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://b50nne4g7wvf8"]
+
+[ext_resource type="Script" uid="uid://dbw1u8nyqhl1r" path="res://ui/dialog/pause_dialog.gd" id="1_ef642"]
+
+[node name="PauseDialog" type="CanvasLayer" unique_id=2060055621]
+script = ExtResource("1_ef642")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=370591613]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="PanelContainer" unique_id=550943686]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/CenterContainer" unique_id=1260835108]
+layout_mode = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="PanelContainer/CenterContainer/VBoxContainer" unique_id=785032118]
+custom_minimum_size = Vector2(350, 50)
+layout_mode = 2
+bbcode_enabled = true
+text = "[color=gray]The Game is not paused.[/color]"
+fit_content = true
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SaveButton" type="Button" parent="PanelContainer/CenterContainer/VBoxContainer" unique_id=548730769]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "Save"
+
+[node name="LoadButton" type="Button" parent="PanelContainer/CenterContainer/VBoxContainer" unique_id=2133009157]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "Load"
+
+[node name="QuitButton" type="Button" parent="PanelContainer/CenterContainer/VBoxContainer" unique_id=952708291]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "Quit"
