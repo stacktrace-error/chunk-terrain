@@ -5,7 +5,6 @@ signal game_started
 signal player_ready
 signal connection_status_changed(to:MultiplayerPeer.ConnectionStatus)
 
-var peer : ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 var connection_status : MultiplayerPeer.ConnectionStatus:
 	set(x):
 		if(connection_status != x):
@@ -22,12 +21,13 @@ func _process(_delta: float) -> void:
 	if p and !multiplayer.is_server(): connection_status = p.get_connection_status()
 
 
-func host_parse_port(port_string:String="") -> void:
+func host_parse_port(port_string:String="") -> bool:
 	var port : int = default_port
 	if !port_string.is_empty(): port = port_string.to_int()
-	host(port)
+	return host(port)
 
-func host(port:int=default_port) -> void:
+func host(port:int=default_port) -> bool:
+	var peer : ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 	var error : Error = peer.create_server(port)
 	match error:
 		ERR_CANT_CREATE: ErrorPopup.show_with(str("Couldn't create server with port ", port, "."))
@@ -35,43 +35,54 @@ func host(port:int=default_port) -> void:
 		OK:
 			multiplayer.multiplayer_peer = peer
 			multiplayer.peer_connected.connect(on_peer_connected)
+			multiplayer.peer_disconnected.connect(remove_player)
+			#multiplayer.peer_disconnected.connect()
 			on_peer_connected(1)
 			
 			# This could be on a button, but that's not needed right now
 			rpc_start_game.rpc()
 			
 			DisplayServer.window_set_title.call_deferred("hosting")
+			
+			return true
+	return false
 
 
-func join_parse_port(address:String) -> void:
-	var split : PackedStringArray = address.rsplit(":", false, 1)	
+func join_parse_port(address:String) -> bool:
+	var split : PackedStringArray = address.rsplit(":", false, 1)
 	
-	if split.size() > 1: join(split[0], split[1].to_int())
-	else: join(address, default_port)
+	if split.size() > 1: return join(split[0], split[1].to_int())
+	return join(address, default_port)
 
-func join(address:String="localhost", port:int=default_port) -> void:
+func join(address:String="localhost", port:int=default_port) -> bool:
+	var peer : ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 	var error : Error = peer.create_client(address, port)
 	match error:
 		ERR_CANT_CREATE: ErrorPopup.show_with(str("Couldn't create client for ", address, ":", port, "."))
 		ERR_ALREADY_IN_USE: ErrorPopup.show_with("Multiplayer peer already in use.")
 		OK:
 			multiplayer.multiplayer_peer = peer
+			
+			multiplayer.peer_disconnected.connect(remove_player)
+			
 			DisplayServer.window_set_title.call_deferred("joining")
 			multiplayer.connected_to_server.connect(func()->void:DisplayServer.window_set_title(str(address, ":", port)))
-			
+			return true
+	return false
 
 
 func on_peer_connected(id:int) -> void:
-	if !players.is_empty():
-		for player : int in players:
-			rpc_add_player.rpc_id(id, player)
-	rpc_add_player.rpc(id)
+	# send current players to the new peer
+	for player : int in players:
+		rpc_add_player.rpc_id(id, player)
 	
-	if has_started: rpc_start_game.rpc_id(id)
+	rpc_add_player.rpc(id) # add the peer's player for everyone else
+	
+	if has_started: rpc_start_game.rpc_id(id) # tell them the game has started
 
 @rpc("call_local")
 func rpc_add_player(id:int) -> void:
-	if players.get(id, null):
+	if players.get(id):
 		print("attempted to spawn duplicate brain for " + str(id))
 		return
 	
@@ -82,15 +93,22 @@ func rpc_add_player(id:int) -> void:
 
 
 func quit() -> void:
-	if multiplayer.get_unique_id() == 1:
-		pass
-	else:
-		rpc_ask_quit.rpc_id(1)
+	multiplayer.multiplayer_peer.close()
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+	
+	for child : Node in get_children(): child.free()
+	players.clear()
+	
+	Surfaces.clear()
+	
+	has_started = false
+	
+	DisplayServer.window_set_title.call_deferred("main menu")
 
-
-@rpc("any_peer")
-func rpc_ask_quit() -> void:
-	peer.disconnect_peer(multiplayer.get_remote_sender_id())
+func remove_player(id:int) -> void:
+	if players.has(id):
+		players[id].remove()
+		players.erase(id)
 
 
 @rpc("call_local")

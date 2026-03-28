@@ -1,8 +1,6 @@
-extends Control
+extends CanvasLayer
 
 func _ready() -> void:
-	Lobby.player_ready.connect(hide)
-	
 	var args : Dictionary[String, String] = Util.launch_args
 	if "host" in args: Lobby.host_parse_port(args["host"])
 	elif "join" in args: Lobby.join_parse_port(args["join"])

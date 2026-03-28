@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://b5lib4cfpco6n"]
 
-[ext_resource type="Script" uid="uid://y1hsvj0qhxxw" path="res://ui/lobby_start_panel.gd" id="1_06t4h"]
+[ext_resource type="Script" uid="uid://odi10mmsp3vl" path="res://ui/main_menu.gd" id="1_t7e0r"]
 
 [node name="MainMenu" type="CanvasLayer" unique_id=897139959]
+script = ExtResource("1_t7e0r")
 
 [node name="NetworkPanel" type="Control" parent="." unique_id=1548645537]
 unique_name_in_owner = true
@@ -12,7 +13,6 @@ anchor_bottom = 1.0
 offset_right = 275.0
 grow_vertical = 2
 size_flags_vertical = 3
-script = ExtResource("1_06t4h")
 
 [node name="Selector" type="TabContainer" parent="NetworkPanel" unique_id=1558555824]
 layout_mode = 1

@@ -26,6 +26,12 @@ func on_game_start() -> void:
 	
 	loaded.emit()
 
+func clear() -> void:
+	for child : Node in get_children(): child.free()
+	
+	spawn_point = null
+	warper = null
+
 func create_surface(_seed:int) -> Surface:
 	var s : Surface = Surface.new()
 	s.tile_set = load("res://assets/tiles/tileset.tres")

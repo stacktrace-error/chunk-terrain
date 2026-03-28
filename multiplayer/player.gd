@@ -37,8 +37,7 @@ func spawn_body() -> void:
 func get_colored_name() -> String:
 	return str("[color=", color.to_html(false), "]", nickname, "[/color]")
 
-#TODO temporary
-func free() -> void:
+func remove() -> void:
 	HUD.chat.add_message(tr("msg_player_disconnected") % nickname)
-	body.free()
-	super.free()
+	body.queue_free()
+	queue_free()
