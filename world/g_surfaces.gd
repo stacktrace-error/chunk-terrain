@@ -1,11 +1,18 @@
 extends Node
 
+signal loaded
+
 var file_path : String = ""
+
 var spawn_point : Node2D:
 	get:
 		return active_surface
 #var warper : Warper
 
+var has_loaded : bool:
+	set(x):
+		has_loaded = x
+		if x: loaded.emit()
 var active_surface : Surface:
 	set(x):
 		if active_surface:
@@ -34,6 +41,7 @@ func new_game() -> void:
 	#active_surface.add_child.call_deferred(warper)
 	
 	file_path = ""
+	has_loaded = true
 
 func load_from(path:String) -> void:
 	var file : FileAccess = FileAccess.open(path, FileAccess.READ)
@@ -44,6 +52,12 @@ func load_from(path:String) -> void:
 	
 	file.close()
 	file_path = path
+	has_loaded = true
+
+func rpc_add_stubs(stubs:Array[String]) -> void:
+	for surface : String in stubs: add_child(Surface.deserialize(surface))
+	active_surface = get_child(0)
+	has_loaded = true
 
 
 func save() -> void:
@@ -57,17 +71,27 @@ func save_as(path:String) -> void:
 		if child is Surface:
 			surfaces.append(child.serialize())
 	
-	print(JSON.stringify(surfaces, ""))
+	#print(JSON.stringify(surfaces, ""))
 	file.store_string(JSON.stringify(surfaces, ""))
 	file.close()
 	file_path = path
 
+func to_stubs() -> Array[String]:
+	var stubs : Array[String] = []
+	
+	for child : Node in get_children():
+		if child is Surface:
+			stubs.append(child.serialize())
+	return stubs
+
+
 func clear() -> void:
 	for child : Node in get_children(): child.free()
 	
+	has_loaded = false
+	
 	#spawn_point = null
 	#warper = null
-
 
 func get_parent_surface(node:Node) -> Surface:
 	while node:

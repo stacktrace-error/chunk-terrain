@@ -34,24 +34,29 @@ func serialize() -> String:
 			"tiles" = serialize_chunk_tiles(cxy)
 		}
 	
-	var surface : Dictionary[String, Variant] = {
+	return JSON.stringify({
 		"name" = name,
 		"seed" = generation_seed,
 		"chunks" = chunks
-	}
-	
-	return JSON.stringify(surface, "")
+	})
+
+func serialize_stub() -> String:
+	return JSON.stringify({
+		"name" = name,
+		"seed" = generation_seed,
+	})
 
 static func deserialize(json:String) -> Surface:
 	var surface : Dictionary = JSON.parse_string(json)
 	var s : Surface = create(surface["name"], surface["seed"])
 	
-	for c : String in surface["chunks"]:
-		var arr : Array = JSON.parse_string(c) #can't json vectors, parse an array instead
-		var cxy : Vector2i = Vector2i(arr[0], arr[1])
-		
-		s.deserialize_chunk_tiles(cxy, surface["chunks"][c]["tiles"])
-		s.used_chunks[cxy] = null
+	if surface.has("chunks"):
+		for c : String in surface["chunks"]:
+			var arr : Array = JSON.parse_string(c) #can't json vectors, parse an array instead
+			var cxy : Vector2i = Vector2i(arr[0], arr[1])
+			
+			s.deserialize_chunk_tiles(cxy, surface["chunks"][c]["tiles"])
+			s.used_chunks[cxy] = null
 	return s
 
 

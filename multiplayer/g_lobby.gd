@@ -131,7 +131,7 @@ func remove_player(id:int) -> void:
 @rpc("call_local")
 func rpc_start_game() -> void:
 	if players.is_empty(): on_peer_connected(1)
-	if !Surfaces.active_surface: Surfaces.new_game()
+	#if !Surfaces.active_surface: Surfaces.new_game()
 	has_started = true
 	game_started.emit()
 
