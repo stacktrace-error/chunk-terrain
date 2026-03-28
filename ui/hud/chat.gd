@@ -19,6 +19,8 @@ const recent_fade_time : float = 10
 
 func _ready() -> void:
 	Lobby.player_ready.connect(show_recent)
+	Lobby.game_quitted.connect(clear)
+	Lobby.game_quitted.connect(hide)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("chat"): 
@@ -66,3 +68,8 @@ func _on_chat_input_text_submitted(new_text: String) -> void:
 	
 	%ChatInput.clear()
 	full = false
+
+func clear() -> void:
+	recent.clear()
+	%RecentChat.clear()
+	%ChatText.clear()

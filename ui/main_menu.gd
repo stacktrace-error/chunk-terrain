@@ -1,19 +1,27 @@
 extends CanvasLayer
 
+
 func _ready() -> void:
-	var args : Dictionary[String, String] = Util.launch_args
-	if "host" in args: Lobby.host_parse_port(args["host"])
-	elif "join" in args: Lobby.join_parse_port(args["join"])
+	if Lobby.has_started: hide()
+	
+	Lobby.game_started.connect(hide)
+	Lobby.game_quitted.connect(show)
+	
+	visibility_changed.connect(on_visibility_changed)
+	on_visibility_changed()
 
-func _on_host_submit() -> void:
-	Lobby.host_parse_port(%HostPort.text)
-
-func _on_join_submit() -> void:
+func on_join_submitted() -> void:
 	Lobby.join_parse_port(%JoinAddress.text)
 
-func update_status(status:MultiplayerPeer.ConnectionStatus) -> void:
-	%StatusText.show()
-	match status:
-		MultiplayerPeer.CONNECTION_DISCONNECTED: %StatusText.text = "Not Connected."
-		MultiplayerPeer.CONNECTION_CONNECTING: %StatusText.text = "Connecting."
-		MultiplayerPeer.CONNECTION_CONNECTED: %StatusText.text = "Connected."
+func on_visibility_changed() -> void:
+	if visible:
+		DisplayServer.window_set_title.call_deferred("main menu")
+
+
+func _on_load_dialog_file_selected(path: String) -> void:
+	Surfaces.load_from(path)
+	Lobby.rpc_start_game.rpc()
+
+func _on_new_game_pressed() -> void:
+	Surfaces.new_game()
+	Lobby.rpc_start_game.rpc()

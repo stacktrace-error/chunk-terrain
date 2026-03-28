@@ -10,47 +10,51 @@ var used_chunks : Dictionary[Vector2i, Variant] = {}
 
 const chunk_size : Vector2i = Vector2i(16, 16)
 
-func _input(_event : InputEvent) -> void:
-	if Input.is_action_just_pressed("save"): save_file()
-	if Input.is_action_just_pressed("load"): load_file()
-
 #func _process(_delta):
 	#if Input.is_action_pressed("regenerate"):
 		#var cxy : Vector2i = local_to_chunk(get_local_mouse_position())
 		#print(cxy)
 		#generate_chunk(cxy)
 
-#region save/load
-func save_file() -> void:
+static func create(_name:String, _seed:int) -> Surface:
+	var s : Surface = Surface.new()
+	s.tile_set = load("res://assets/tiles/tileset.tres")
+	s.noise = load("res://assets/new_fast_noise_lite.tres")
+	s.generation_seed = _seed
+	s.name = _name
+	return s
+
+
+#region (de)serialization
+func serialize() -> String:
 	var chunks : Dictionary[String, Dictionary] = {}
-	
 	for cxy : Vector2i in used_chunks:
 		chunks[str("[", cxy[0], ", ", cxy[1], "]")] = {
 			"entities" = [],
 			"tiles" = serialize_chunk_tiles(cxy)
 		}
-
-	var file : FileAccess = FileAccess.open(str("user://", name, ".dat"), FileAccess.WRITE)
-	file.store_string(JSON.stringify(chunks, "\t"))
-	file.close()
-
-func load_file() -> void:
-	var file : FileAccess = FileAccess.open(str("user://", name, ".dat"), FileAccess.READ)
-	var chunks : Dictionary = JSON.parse_string(file.get_as_text())
 	
-	clear()
-	used_chunks.clear()
+	var surface : Dictionary[String, Variant] = {
+		"name" = name,
+		"seed" = generation_seed,
+		"chunks" = chunks
+	}
 	
-	for c : String in chunks:
+	return JSON.stringify(surface, "")
+
+static func deserialize(json:String) -> Surface:
+	var surface : Dictionary = JSON.parse_string(json)
+	var s : Surface = create(surface["name"], surface["seed"])
+	
+	for c : String in surface["chunks"]:
 		var arr : Array = JSON.parse_string(c) #can't json vectors, parse an array instead
 		var cxy : Vector2i = Vector2i(arr[0], arr[1])
 		
-		deserialize_chunk_tiles(cxy, chunks[c]["tiles"])
-		used_chunks[cxy] = null
-#endregion
+		s.deserialize_chunk_tiles(cxy, surface["chunks"][c]["tiles"])
+		s.used_chunks[cxy] = null
+	return s
 
 
-#region (de)serialization
 func deserialize_chunk_tiles(cxy:Vector2i, chunk:Array) -> void:
 	var mxy : Vector2i = Vector2i()
 	for mx in chunk_size[0]: for my in chunk_size[1]:
@@ -74,6 +78,7 @@ func serialize_chunk_tiles(cxy:Vector2i) -> Array[Array]:
 			
 		chunk[mx] = tiles
 	return chunk
+
 
 func serialize_tile(mxy:Vector2i) -> int:
 	return get_cell_source_id(mxy)

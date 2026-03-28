@@ -1,25 +1,24 @@
-[gd_scene format=3 uid="uid://b50nne4g7wvf8"]
+[gd_scene format=3 uid="uid://db4ftfe6kt4g5"]
 
 [ext_resource type="Script" uid="uid://dbw1u8nyqhl1r" path="res://ui/dialog/pause_dialog.gd" id="1_ef642"]
 
-[node name="PauseDialog" type="CanvasLayer" unique_id=2060055621]
+[node name="PauseDialog" type="CanvasLayer" unique_id=1459408230]
 script = ExtResource("1_ef642")
 
-[node name="PanelContainer" type="PanelContainer" parent="." unique_id=370591613]
-unique_name_in_owner = true
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=832002795]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="CenterContainer" type="CenterContainer" parent="PanelContainer" unique_id=550943686]
+[node name="CenterContainer" type="CenterContainer" parent="PanelContainer" unique_id=207359006]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/CenterContainer" unique_id=1260835108]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/CenterContainer" unique_id=831990594]
 layout_mode = 2
 
-[node name="RichTextLabel" type="RichTextLabel" parent="PanelContainer/CenterContainer/VBoxContainer" unique_id=785032118]
+[node name="RichTextLabel" type="RichTextLabel" parent="PanelContainer/CenterContainer/VBoxContainer" unique_id=981758844]
 custom_minimum_size = Vector2(350, 50)
 layout_mode = 2
 bbcode_enabled = true
@@ -28,20 +27,56 @@ fit_content = true
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SaveButton" type="Button" parent="PanelContainer/CenterContainer/VBoxContainer" unique_id=548730769]
+[node name="SaveButton" type="Button" parent="PanelContainer/CenterContainer/VBoxContainer" unique_id=333725144]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "Save"
 
-[node name="LoadButton" type="Button" parent="PanelContainer/CenterContainer/VBoxContainer" unique_id=2133009157]
+[node name="SaveAsButton" type="Button" parent="PanelContainer/CenterContainer/VBoxContainer" unique_id=1905507298]
 unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "Save As"
+
+[node name="LoadButton" type="Button" parent="PanelContainer/CenterContainer/VBoxContainer" unique_id=618872808]
+unique_name_in_owner = true
+visible = false
 layout_mode = 2
 focus_mode = 0
 text = "Load"
 
-[node name="QuitButton" type="Button" parent="PanelContainer/CenterContainer/VBoxContainer" unique_id=952708291]
+[node name="QuitButton" type="Button" parent="PanelContainer/CenterContainer/VBoxContainer" unique_id=1298323752]
 unique_name_in_owner = true
 layout_mode = 2
 focus_mode = 0
 text = "Quit"
+
+[node name="Host" type="HBoxContainer" parent="PanelContainer/CenterContainer/VBoxContainer" unique_id=1053807266]
+unique_name_in_owner = true
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="HostPort" type="LineEdit" parent="PanelContainer/CenterContainer/VBoxContainer/Host" unique_id=869207773]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "13500"
+placeholder_text = "Enter port number..."
+emoji_menu_enabled = false
+
+[node name="HostButton" type="Button" parent="PanelContainer/CenterContainer/VBoxContainer/Host" unique_id=1479040645]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+text = "Host"
+
+[node name="SaveDialog" type="FileDialog" parent="." unique_id=1929472382]
+unique_name_in_owner = true
+access = 1
+filters = PackedStringArray("*.json")
+use_native_dialog = true
+
+[connection signal="text_submitted" from="PanelContainer/CenterContainer/VBoxContainer/Host/HostPort" to="." method="on_host_submitted" unbinds=1]
+[connection signal="pressed" from="PanelContainer/CenterContainer/VBoxContainer/Host/HostButton" to="." method="on_host_submitted"]

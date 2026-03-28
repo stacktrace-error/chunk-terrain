@@ -16,8 +16,8 @@ func _ready() -> void:
 	if is_multiplayer_authority():
 		Lobby.player_ready.emit()
 	
-	if Surfaces.active_surface == null:
-		Surfaces.loaded.connect(spawn_body, CONNECT_ONE_SHOT)
+	if !Lobby.has_started:
+		Lobby.game_started.connect(spawn_body, CONNECT_ONE_SHOT)
 	else: 
 		spawn_body()
 

@@ -1,39 +1,52 @@
-[gd_scene format=3 uid="uid://b5lib4cfpco6n"]
+[gd_scene format=3 uid="uid://b50nne4g7wvf8"]
 
-[ext_resource type="Script" uid="uid://odi10mmsp3vl" path="res://ui/main_menu.gd" id="1_t7e0r"]
+[ext_resource type="Script" uid="uid://qthtmxf0u1ta" path="res://ui/main_menu.gd" id="1_qtwoh"]
 
-[node name="MainMenu" type="CanvasLayer" unique_id=897139959]
-script = ExtResource("1_t7e0r")
+[node name="MainMenu" type="CanvasLayer" unique_id=2060055621]
+script = ExtResource("1_qtwoh")
 
-[node name="NetworkPanel" type="Control" parent="." unique_id=1548645537]
-unique_name_in_owner = true
-layout_mode = 3
-anchors_preset = 9
-anchor_bottom = 1.0
-offset_right = 275.0
-grow_vertical = 2
-size_flags_vertical = 3
-
-[node name="Selector" type="TabContainer" parent="NetworkPanel" unique_id=1558555824]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=60261454]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -62.0
 grow_horizontal = 2
-grow_vertical = 0
-size_flags_vertical = 10
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="PanelContainer" unique_id=1241330731]
+layout_mode = 2
+
+[node name="TabContainer" type="TabContainer" parent="PanelContainer/CenterContainer" unique_id=318418124]
+layout_mode = 2
 current_tab = 0
 
-[node name="Join" type="VBoxContainer" parent="NetworkPanel/Selector" unique_id=963375919]
+[node name="Play" type="VBoxContainer" parent="PanelContainer/CenterContainer/TabContainer" unique_id=375045166]
+custom_minimum_size = Vector2(350, 0)
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="Join" type="HBoxContainer" parent="NetworkPanel/Selector/Join" unique_id=242613971]
+[node name="RichTextLabel2" type="RichTextLabel" parent="PanelContainer/CenterContainer/TabContainer/Play" unique_id=1173854413]
+custom_minimum_size = Vector2(350, 50)
 layout_mode = 2
+bbcode_enabled = true
+text = "This is a main menu!!!!!!!!!!!!!!!!!!!"
+fit_content = true
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="JoinAddress" type="LineEdit" parent="NetworkPanel/Selector/Join/Join" unique_id=2027740086]
+[node name="NewGame" type="Button" parent="PanelContainer/CenterContainer/TabContainer/Play" unique_id=839529766]
+layout_mode = 2
+text = "New Game"
+
+[node name="LoadGame" type="Button" parent="PanelContainer/CenterContainer/TabContainer/Play" unique_id=293170101]
+layout_mode = 2
+text = "Load Game"
+
+[node name="Join Game" type="HBoxContainer" parent="PanelContainer/CenterContainer/TabContainer" unique_id=1415806010]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="JoinAddress" type="LineEdit" parent="PanelContainer/CenterContainer/TabContainer/Join Game" unique_id=1845898410]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -42,38 +55,21 @@ text = "localhost"
 placeholder_text = "ex. \"127.0.0.1\""
 emoji_menu_enabled = false
 
-[node name="JoinButton" type="Button" parent="NetworkPanel/Selector/Join/Join" unique_id=994324684]
+[node name="JoinButton" type="Button" parent="PanelContainer/CenterContainer/TabContainer/Join Game" unique_id=785626236]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
-text = "Confirm"
+text = "Join"
 
-[node name="StatusText" type="Label" parent="NetworkPanel/Selector/Join" unique_id=484155277]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-text = "Not connected."
+[node name="LoadDialog" type="FileDialog" parent="." unique_id=399311486]
+title = "Open a File"
+file_mode = 0
+access = 1
+filters = PackedStringArray("*.json")
+use_native_dialog = true
 
-[node name="Host" type="HBoxContainer" parent="NetworkPanel/Selector" unique_id=401531738]
-visible = false
-layout_mode = 2
-metadata/_tab_index = 1
-
-[node name="HostPort" type="LineEdit" parent="NetworkPanel/Selector/Host" unique_id=280574990]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-placeholder_text = "Enter port number..."
-emoji_menu_enabled = false
-
-[node name="HostButton" type="Button" parent="NetworkPanel/Selector/Host" unique_id=1110564422]
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 4
-text = "Confirm"
-
-[connection signal="text_submitted" from="NetworkPanel/Selector/Join/Join/JoinAddress" to="NetworkPanel" method="_on_join_submit" unbinds=1]
-[connection signal="pressed" from="NetworkPanel/Selector/Join/Join/JoinButton" to="NetworkPanel" method="_on_join_submit"]
-[connection signal="text_submitted" from="NetworkPanel/Selector/Host/HostPort" to="NetworkPanel" method="_on_host_submit" unbinds=1]
-[connection signal="pressed" from="NetworkPanel/Selector/Host/HostButton" to="NetworkPanel" method="_on_host_submit"]
+[connection signal="pressed" from="PanelContainer/CenterContainer/TabContainer/Play/NewGame" to="." method="_on_new_game_pressed"]
+[connection signal="pressed" from="PanelContainer/CenterContainer/TabContainer/Play/LoadGame" to="LoadDialog" method="popup_centered_clamped"]
+[connection signal="text_submitted" from="PanelContainer/CenterContainer/TabContainer/Join Game/JoinAddress" to="." method="on_join_submitted" unbinds=1]
+[connection signal="pressed" from="PanelContainer/CenterContainer/TabContainer/Join Game/JoinButton" to="." method="on_join_submitted"]
+[connection signal="file_selected" from="LoadDialog" to="." method="_on_load_dialog_file_selected"]

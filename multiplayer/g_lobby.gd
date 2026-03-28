@@ -1,6 +1,7 @@
 extends Node
 
 signal game_started
+signal game_quitted
 @warning_ignore("unused_signal")
 signal player_ready
 signal connection_status_changed(to:MultiplayerPeer.ConnectionStatus)
@@ -15,6 +16,13 @@ var players : Dictionary[int, Player] = {}
 var has_started : bool
 
 const default_port : int = 13500
+
+func _ready() -> void:
+	var args : Dictionary[String, String] = Util.launch_args
+	if args.has("host"):
+		host_parse_port(args["host"])
+	elif args.has("join"): 
+		join_parse_port(args["join"])
 
 func _process(_delta: float) -> void:
 	var p : MultiplayerPeer = multiplayer.multiplayer_peer
@@ -40,7 +48,7 @@ func host(port:int=default_port) -> bool:
 			on_peer_connected(1)
 			
 			# This could be on a button, but that's not needed right now
-			rpc_start_game.rpc()
+			if !has_started: rpc_start_game.rpc()
 			
 			DisplayServer.window_set_title.call_deferred("hosting")
 			
@@ -55,6 +63,8 @@ func join_parse_port(address:String) -> bool:
 	return join(address, default_port)
 
 func join(address:String="localhost", port:int=default_port) -> bool:
+	quit()
+	
 	var peer : ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 	var error : Error = peer.create_client(address, port)
 	match error:
@@ -62,16 +72,17 @@ func join(address:String="localhost", port:int=default_port) -> bool:
 		ERR_ALREADY_IN_USE: ErrorPopup.show_with("Multiplayer peer already in use.")
 		OK:
 			multiplayer.multiplayer_peer = peer
-			
 			multiplayer.peer_disconnected.connect(remove_player)
+			multiplayer.server_disconnected.connect(quit)
 			
-			DisplayServer.window_set_title.call_deferred("joining")
-			multiplayer.connected_to_server.connect(func()->void:DisplayServer.window_set_title(str(address, ":", port)))
+			DisplayServer.window_set_title.call_deferred(str(address, ":", port))
 			return true
 	return false
 
 
 func on_peer_connected(id:int) -> void:
+	if players.get(id): return
+	
 	# send current players to the new peer
 	for player : int in players:
 		rpc_add_player.rpc_id(id, player)
@@ -93,6 +104,14 @@ func rpc_add_player(id:int) -> void:
 
 
 func quit() -> void:
+	## ffs. 
+	if multiplayer.peer_disconnected.is_connected(remove_player):
+		multiplayer.peer_disconnected.disconnect(remove_player)
+	if multiplayer.peer_connected.is_connected(on_peer_connected):
+		multiplayer.peer_connected.disconnect(on_peer_connected)
+	if multiplayer.server_disconnected.is_connected(quit):
+		multiplayer.server_disconnected.disconnect(quit)
+	
 	multiplayer.multiplayer_peer.close()
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 	
@@ -100,10 +119,8 @@ func quit() -> void:
 	players.clear()
 	
 	Surfaces.clear()
-	
 	has_started = false
-	
-	DisplayServer.window_set_title.call_deferred("main menu")
+	game_quitted.emit()
 
 func remove_player(id:int) -> void:
 	if players.has(id):
@@ -113,8 +130,13 @@ func remove_player(id:int) -> void:
 
 @rpc("call_local")
 func rpc_start_game() -> void:
+	if players.is_empty(): on_peer_connected(1)
+	if !Surfaces.active_surface: Surfaces.new_game()
 	has_started = true
 	game_started.emit()
+
+func is_open() -> bool:
+	return has_started || multiplayer.multiplayer_peer is ENetMultiplayerPeer
 
 
 func local_player() -> Player:
