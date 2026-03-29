@@ -7,7 +7,7 @@ func _ready() -> void:
 	
 	%SaveDialog.file_selected.connect(Surfaces.save_as)
 	
-	Lobby.game_quitted.connect(hide)
+	Surfaces.world_closed.connect(hide)
 	hide()
 
 
@@ -15,5 +15,5 @@ func on_host_submitted() -> void:
 	Lobby.host_parse_port(%HostPort.text)
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("pause_menu") && Lobby.is_open():
+	if event.is_action_pressed("pause_menu"):
 		visible = !visible

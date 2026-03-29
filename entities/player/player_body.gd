@@ -12,6 +12,15 @@ var cxy : Vector2i
 
 const chunk_radius : int = 8
 
+static func create(id:int, mul_api:MultiplayerAPI) -> PlayerBody:
+	var body : PlayerBody= preload("res://entities/player/player_body.tscn").instantiate()
+	body.set_multiplayer_authority(id)
+	body.surface_changed.connect(Surfaces.set_active_surface)
+	
+	if mul_api.get_unique_id() == id: Camera.target = body
+	
+	return body
+
 func _enter_tree() -> void:
 	surface = Surfaces.get_parent_surface(self)
 	load_chunks()

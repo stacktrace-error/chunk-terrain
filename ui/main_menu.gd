@@ -2,10 +2,10 @@ extends CanvasLayer
 
 
 func _ready() -> void:
-	if Lobby.has_started: hide()
+	if Surfaces.has_world: hide()
 	
-	Lobby.game_started.connect(hide)
-	Lobby.game_quitted.connect(show)
+	Surfaces.world_created.connect(hide)
+	Surfaces.world_closed.connect(show)
 	
 	visibility_changed.connect(on_visibility_changed)
 	on_visibility_changed()
@@ -20,8 +20,8 @@ func on_visibility_changed() -> void:
 
 func _on_load_dialog_file_selected(path: String) -> void:
 	Surfaces.load_from(path)
-	Lobby.rpc_start_game.rpc()
+	Lobby.start_game()
 
 func _on_new_game_pressed() -> void:
 	Surfaces.new_game()
-	Lobby.rpc_start_game.rpc()
+	Lobby.start_game()

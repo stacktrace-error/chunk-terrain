@@ -40,7 +40,7 @@ func serialize() -> String:
 		"chunks" = chunks
 	})
 
-func serialize_stub() -> String:
+func to_stub() -> String:
 	return JSON.stringify({
 		"name" = name,
 		"seed" = generation_seed,

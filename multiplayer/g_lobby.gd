@@ -1,9 +1,6 @@
 extends Node
 
-signal game_started
-signal game_quitted
 @warning_ignore("unused_signal")
-signal player_ready
 signal connection_status_changed(to:MultiplayerPeer.ConnectionStatus)
 
 var connection_status : MultiplayerPeer.ConnectionStatus:
@@ -12,8 +9,7 @@ var connection_status : MultiplayerPeer.ConnectionStatus:
 			connection_status = x
 			connection_status_changed.emit(x)
 
-var players : Dictionary[int, Player] = {}
-var has_started : bool
+var players : Dictionary[int, Dictionary] = {}
 
 const default_port : int = 13500
 
@@ -48,7 +44,7 @@ func host(port:int=default_port) -> bool:
 			on_peer_connected(1)
 			
 			# This could be on a button, but that's not needed right now
-			if !has_started: rpc_start_game.rpc()
+			#if !has_started: rpc_start_game.rpc()
 			
 			DisplayServer.window_set_title.call_deferred("hosting")
 			
@@ -84,60 +80,52 @@ func on_peer_connected(id:int) -> void:
 	if players.get(id): return
 	
 	# send current players to the new peer
-	for player : int in players:
-		rpc_add_player.rpc_id(id, player)
+	for p : int in players:
+		rpc_add_player.rpc_id(id, p)
 	
 	rpc_add_player.rpc(id) # add the peer's player for everyone else
 	
-	if has_started: rpc_start_game.rpc_id(id) # tell them the game has started
+	Surfaces.on_peer_connected(id)
 
 @rpc("call_local")
 func rpc_add_player(id:int) -> void:
 	if players.get(id):
-		print("attempted to spawn duplicate brain for " + str(id))
+		print("attempted to add duplicate player " + str(id))
 		return
 	
-	var player : Player = Player.new()
-	player.name = str(id)
+	var player : Dictionary = {
+		"id" = id,
+		"nickname" = "Nullevoy" if id == 1 else "fuckass bum",
+		"color" = Color.GRAY,
+	}
 	players[id] = player
-	add_child(player)
+	
+	HUD.chat.add_message(tr("msg_player_connected") % player.nickname)
 
+
+func start_game() -> void:
+	if players.is_empty(): rpc_add_player(1)
+	Surfaces.on_game_started()
 
 func quit() -> void:
 	## ffs. 
-	if multiplayer.peer_disconnected.is_connected(remove_player):
-		multiplayer.peer_disconnected.disconnect(remove_player)
-	if multiplayer.peer_connected.is_connected(on_peer_connected):
-		multiplayer.peer_connected.disconnect(on_peer_connected)
-	if multiplayer.server_disconnected.is_connected(quit):
-		multiplayer.server_disconnected.disconnect(quit)
+	Util.check_disconnect(multiplayer.peer_disconnected, remove_player)
+	Util.check_disconnect(multiplayer.peer_connected, on_peer_connected)
+	Util.check_disconnect(multiplayer.server_disconnected, quit)
 	
 	multiplayer.multiplayer_peer.close()
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 	
-	for child : Node in get_children(): child.free()
 	players.clear()
-	
 	Surfaces.clear()
-	has_started = false
-	game_quitted.emit()
 
-func remove_player(id:int) -> void:
+func remove_player(id:int) -> void: 
 	if players.has(id):
-		players[id].remove()
+		HUD.chat.add_message(tr("msg_player_disconnected") % players[id].nickname)
 		players.erase(id)
 
+func local_player() -> Dictionary:
+	return players.get(multiplayer.get_unique_id())
 
-@rpc("call_local")
-func rpc_start_game() -> void:
-	if players.is_empty(): on_peer_connected(1)
-	#if !Surfaces.active_surface: Surfaces.new_game()
-	has_started = true
-	game_started.emit()
-
-func is_open() -> bool:
-	return has_started || multiplayer.multiplayer_peer is ENetMultiplayerPeer
-
-
-func local_player() -> Player:
-	return players.get(multiplayer.get_unique_id(), null)
+func get_colored_name(id:int) -> String:
+	return str("[color=", players[id].color.to_html(false), "]", players[id].nickname, "[/color]")

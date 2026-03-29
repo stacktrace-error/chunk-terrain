@@ -1,7 +1,7 @@
 class_name WarpPanel extends Control
 
 #func _ready() -> void:
-	#Lobby.game_started.connect(setup)
+	#Surfaces.world_created.connect(setup)
 #
 #func setup() -> void:
 	#if is_multiplayer_authority():

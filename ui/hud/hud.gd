@@ -7,4 +7,4 @@ extends CanvasLayer
 func _ready() -> void:
 	for child : Control in get_children():
 		child.hide()
-	Lobby.player_ready.connect(chat.show)
+	chat.show()

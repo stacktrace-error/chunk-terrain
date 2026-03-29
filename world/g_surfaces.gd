@@ -1,18 +1,22 @@
 extends Node
 
-signal loaded
+signal world_created
+signal world_closed
 
 var file_path : String = ""
 
-var spawn_point : Node2D:
-	get:
-		return active_surface
+#var spawn_point : Node2D:
+	#get:
+		#return active_surface
 #var warper : Warper
 
-var has_loaded : bool:
+var has_world : bool:
 	set(x):
-		has_loaded = x
-		if x: loaded.emit()
+		if has_world != x:
+			has_world = x
+			if has_world:
+				world_created.emit()
+			else: world_closed.emit()
 var active_surface : Surface:
 	set(x):
 		if active_surface:
@@ -27,11 +31,31 @@ func _ready() -> void:
 	
 	if args.has("load"): 
 		load_from(args["load"])
-		Lobby.rpc_start_game.rpc()
+		Lobby.start_game()
 	elif args.has("new-game"): 
 		new_game()
-		Lobby.rpc_start_game.rpc()
+		Lobby.start_game()
 
+
+func on_peer_connected(id:int) -> void:
+	if has_world and !id == 1: 
+		rpc_add_stubs.rpc_id(id, to_stubs())
+		
+		for player : int in Lobby.players:
+			rpc_spawn_body.rpc_id(id, player)
+		
+		rpc_spawn_body.rpc(id)
+
+func on_game_started() -> void:
+	rpc_add_stubs.rpc(to_stubs())
+	for player : int in Lobby.players:
+		rpc_spawn_body.rpc(player)
+
+@rpc("call_local")
+func rpc_spawn_body(id:int) -> void:
+	active_surface.add_child(PlayerBody.create(id, multiplayer))
+
+#region creation/deserialization
 func new_game() -> void:
 	var s : Surface = Surface.create("nauvis", 3)
 	active_surface = s
@@ -41,7 +65,7 @@ func new_game() -> void:
 	#active_surface.add_child.call_deferred(warper)
 	
 	file_path = ""
-	has_loaded = true
+	has_world = true
 
 func load_from(path:String) -> void:
 	var file : FileAccess = FileAccess.open(path, FileAccess.READ)
@@ -52,14 +76,18 @@ func load_from(path:String) -> void:
 	
 	file.close()
 	file_path = path
-	has_loaded = true
+	has_world = true
 
+@rpc
 func rpc_add_stubs(stubs:Array[String]) -> void:
+	if has_world: return
+	
 	for surface : String in stubs: add_child(Surface.deserialize(surface))
 	active_surface = get_child(0)
-	has_loaded = true
+	has_world = true
+#endregion
 
-
+#region serializiation
 func save() -> void:
 	if !file_path.is_empty(): save_as(file_path)
 
@@ -81,14 +109,14 @@ func to_stubs() -> Array[String]:
 	
 	for child : Node in get_children():
 		if child is Surface:
-			stubs.append(child.serialize())
+			stubs.append(child.to_stub())
 	return stubs
-
+#endregion
 
 func clear() -> void:
 	for child : Node in get_children(): child.free()
 	
-	has_loaded = false
+	has_world = false
 	
 	#spawn_point = null
 	#warper = null
