@@ -7,6 +7,8 @@ func _ready() -> void:
 	Surfaces.world_created.connect(hide)
 	Surfaces.world_closed.connect(show)
 	
+	%JoinAddress.text = Settings.read_setting("last_join_ip")
+	
 	visibility_changed.connect(on_visibility_changed)
 	on_visibility_changed()
 

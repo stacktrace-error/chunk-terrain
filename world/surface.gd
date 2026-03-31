@@ -59,20 +59,6 @@ static func deserialize(json:String) -> Surface:
 	return s
 
 
-## Places tiles from serialized chunk data.
-## If chunk data is empty, generates the chunk instead.
-func deserialize_chunk_tiles(cxy:Vector2i, chunk:Array) -> void:
-	if chunk.is_empty(): 
-		generate_chunk(cxy)
-		return
-	
-	mark_chunk_used(cxy)
-	var mxy : Vector2i = Vector2i()
-	for mx in chunk_size[0]: for my in chunk_size[1]:
-		mxy[0] = cxy[0] * chunk_size[0] + mx
-		mxy[1] = cxy[1] * chunk_size[1] + my
-		deserialize_tile(mxy, chunk[mx][my])
-
 ## Puts chunk data into a format that can be sent over network. 
 ## Returns empty data when the chunk can be generated.
 func serialize_chunk_tiles(cxy:Vector2i) -> Array:
@@ -93,6 +79,20 @@ func serialize_chunk_tiles(cxy:Vector2i) -> Array:
 			
 		chunk[mx] = tiles
 	return chunk
+
+## Places tiles from serialized chunk data.
+## If chunk data is empty, generates the chunk instead.
+func deserialize_chunk_tiles(cxy:Vector2i, chunk:Array) -> void:
+	if chunk.is_empty(): 
+		generate_chunk(cxy)
+		return
+	
+	mark_chunk_used(cxy)
+	var mxy : Vector2i = Vector2i()
+	for mx in chunk_size[0]: for my in chunk_size[1]:
+		mxy[0] = cxy[0] * chunk_size[0] + mx
+		mxy[1] = cxy[1] * chunk_size[1] + my
+		deserialize_tile(mxy, chunk[mx][my])
 
 
 func serialize_tile(mxy:Vector2i) -> int:

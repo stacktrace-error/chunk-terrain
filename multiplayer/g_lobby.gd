@@ -23,10 +23,12 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	var p : MultiplayerPeer = multiplayer.multiplayer_peer
-	if p and !multiplayer.is_server(): connection_status = p.get_connection_status()
+	if p is ENetMultiplayerPeer and !multiplayer.is_server(): connection_status = p.get_connection_status()
 
 
 func host_parse_port(port_string:String="") -> bool:
+	Settings.write_setting("last_host_port", port_string)
+	
 	var port : int = default_port
 	if !port_string.is_empty(): port = port_string.to_int()
 	return host(port)
@@ -39,13 +41,8 @@ func host(port:int=default_port) -> bool:
 		ERR_ALREADY_IN_USE: ErrorPopup.show_with("Multiplayer peer already in use.")
 		OK:
 			multiplayer.multiplayer_peer = peer
-			multiplayer.peer_connected.connect(on_peer_connected)
 			multiplayer.peer_disconnected.connect(on_peer_disconnected)
-			#multiplayer.peer_disconnected.connect()
-			on_peer_connected(1)
-			
-			# This could be on a button, but that's not needed right now
-			#if !has_started: rpc_start_game.rpc()
+			send_player()
 			
 			DisplayServer.window_set_title.call_deferred("hosting")
 			
@@ -54,6 +51,8 @@ func host(port:int=default_port) -> bool:
 
 
 func join_parse_port(address:String) -> bool:
+	Settings.write_setting("last_join_ip", address)
+	
 	var split : PackedStringArray = address.rsplit(":", false, 1)
 	
 	if split.size() > 1: return join(split[0], split[1].to_int())
@@ -69,49 +68,53 @@ func join(address:String="localhost", port:int=default_port) -> bool:
 		ERR_ALREADY_IN_USE: ErrorPopup.show_with("Multiplayer peer already in use.")
 		OK:
 			multiplayer.multiplayer_peer = peer
-			multiplayer.peer_disconnected.connect(on_peer_disconnected)
+			multiplayer.connected_to_server.connect(send_player)
 			multiplayer.server_disconnected.connect(quit)
+			multiplayer.peer_disconnected.connect(on_peer_disconnected)
 			
 			DisplayServer.window_set_title.call_deferred(str(address, ":", port))
 			return true
 	return false
 
 
-func on_peer_connected(id:int) -> void:
-	if players.get(id): return
+func send_player() -> void:
+	rpc_send_player.rpc_id(1, Settings.get_player())
+
+@rpc("any_peer", "call_local")
+func rpc_send_player(player:Dictionary) -> void:
+	if !multiplayer.is_server(): return
+	player["id"] = multiplayer.get_remote_sender_id()
+	on_player_received(player)
+
+func on_player_received(player:Dictionary) -> void:
+	if players.get(player.id): return
 	
 	# send current players to the new peer
-	for p : int in players:
-		rpc_add_player.rpc_id(id, p)
+	for p : Dictionary in players.values():
+		rpc_add_player.rpc_id(player.id, p)
 	
-	rpc_add_player.rpc(id) # add the peer's player for everyone else
+	rpc_add_player.rpc(player) # add the peer's player for everyone else
 	
-	Surfaces.on_peer_connected(id)
+	Surfaces.on_peer_connected(player.id)
 
 @rpc("call_local")
-func rpc_add_player(id:int) -> void:
-	if players.get(id):
-		print("attempted to add duplicate player " + str(id))
+func rpc_add_player(player:Dictionary) -> void:
+	if players.get(player.id):
+		print("attempted to add duplicate player " + player.id)
 		return
-	
-	var player : Dictionary = {
-		"id" = id,
-		"nickname" = "Nullevoy" if id == 1 else "fuckass bum",
-		"color" = Color.GRAY,
-	}
-	players[id] = player
+	players[player.id] = player
 	
 	HUD.chat.add_message(tr("msg_player_connected") % player.nickname)
 
 
 func start_game() -> void:
-	if players.is_empty(): rpc_add_player(1)
+	if players.is_empty(): send_player()
 	Surfaces.on_game_started()
 
 func quit() -> void:
 	## ffs. 
 	Util.check_disconnect(multiplayer.peer_disconnected, on_peer_disconnected)
-	Util.check_disconnect(multiplayer.peer_connected, on_peer_connected)
+	Util.check_disconnect(multiplayer.connected_to_server, send_player)
 	Util.check_disconnect(multiplayer.server_disconnected, quit)
 	
 	multiplayer.multiplayer_peer.close()
@@ -130,4 +133,4 @@ func local_player() -> Dictionary:
 	return players.get(multiplayer.get_unique_id())
 
 func get_colored_name(id:int) -> String:
-	return str("[color=", players[id].color.to_html(false), "]", players[id].nickname, "[/color]")
+	return str("[color=", players[id].nickname_color, "]", players[id].nickname, "[/color]")

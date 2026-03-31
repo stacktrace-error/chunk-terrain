@@ -24,10 +24,11 @@ config/icon="uid://bqyp2x4sdtnjl"
 [autoload]
 
 Util="*uid://b1ox2g36gt0oq"
+Settings="*uid://mxmkpeh2bwq2"
 HUD="*uid://ct0cs4hrv60t6"
 ErrorPopup="*uid://dvgqqshnkxor2"
 Surfaces="*uid://cotemipcvisqa"
-Lobby="*uid://cq5aeyk33xfvo"
+Lobby="*uid://cgur0hsjp3hq1"
 Camera="*res://g_camera.tscn"
 PingMarkers="*uid://crbgw6ct16osm"
 MainMenu="*uid://b50nne4g7wvf8"

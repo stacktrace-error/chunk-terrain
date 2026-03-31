@@ -62,7 +62,6 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-text = "13500"
 placeholder_text = "Enter port number..."
 emoji_menu_enabled = false
 

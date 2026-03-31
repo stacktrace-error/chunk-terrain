@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://dc8dgp5nmtxbf"]
+
+[ext_resource type="Script" uid="uid://ud6r0xbr2dc0" path="res://ui/player_info.gd" id="1_sjehk"]
+
+[node name="PlayerInfo" type="HBoxContainer" unique_id=1347944645]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -31.0
+offset_right = 244.0
+grow_vertical = 0
+script = ExtResource("1_sjehk")
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="." unique_id=1641970100]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(31, 0)
+layout_mode = 2
+color = Color(0.70980394, 1, 0.70980394, 1)
+edit_alpha = false
+
+[node name="Nickname" type="LineEdit" parent="." unique_id=1210297989]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Enter a nickname..."
+emoji_menu_enabled = false
+
+[connection signal="color_changed" from="ColorPickerButton" to="." method="_on_color_picker_button_color_changed"]
+[connection signal="text_changed" from="Nickname" to="." method="_on_nickname_text_changed"]
