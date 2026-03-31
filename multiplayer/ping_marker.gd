@@ -14,7 +14,7 @@ func setup(player:int, g_pos:Vector2, radius:float=-1, lifetime:float=20) -> voi
 	
 	if radius < 0: radius = default_radius
 	
-	%Text.text = str("[color=orange]", player)
+	%Text.text = Lobby.get_colored_name(player)
 	%Text.position.y = -50 - radius * 0.44
 	
 	var p : PackedVector2Array = points.duplicate()
@@ -22,7 +22,7 @@ func setup(player:int, g_pos:Vector2, radius:float=-1, lifetime:float=20) -> voi
 	
 	%Circle.points = p
 	%CircleColor.points = p
-	%CircleColor.default_color = Color.ORANGE
+	%CircleColor.default_color = Color(Lobby.players[player].nickname_color)
 	
 	var tween : Tween = create_tween()
 	tween.tween_interval(lifetime - fade_time)
