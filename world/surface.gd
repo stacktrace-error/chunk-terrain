@@ -56,7 +56,6 @@ static func deserialize(json:String) -> Surface:
 			var cxy : Vector2i = Vector2i(arr[0], arr[1])
 			
 			s.deserialize_chunk_tiles(cxy, surface["chunks"][c]["tiles"])
-			s.used_chunks[cxy] = null
 	return s
 
 
@@ -67,6 +66,7 @@ func deserialize_chunk_tiles(cxy:Vector2i, chunk:Array) -> void:
 		generate_chunk(cxy)
 		return
 	
+	mark_chunk_used(cxy)
 	var mxy : Vector2i = Vector2i()
 	for mx in chunk_size[0]: for my in chunk_size[1]:
 		mxy[0] = cxy[0] * chunk_size[0] + mx
