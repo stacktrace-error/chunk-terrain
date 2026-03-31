@@ -15,7 +15,10 @@ const chunk_radius : int = 8
 static func create(id:int, mul_api:MultiplayerAPI) -> PlayerBody:
 	var body : PlayerBody= preload("res://entities/player/player_body.tscn").instantiate()
 	body.set_multiplayer_authority(id)
+	body.name = str(id)
 	body.surface_changed.connect(Surfaces.set_active_surface)
+	
+	Lobby.peer_disconnected.connect(body.on_peer_disconnected)
 	
 	if mul_api.get_unique_id() == id: Camera.target = body
 	
@@ -24,6 +27,10 @@ static func create(id:int, mul_api:MultiplayerAPI) -> PlayerBody:
 func _enter_tree() -> void:
 	surface = Surfaces.get_parent_surface(self)
 	load_chunks()
+
+func on_peer_disconnected(id:int) -> void:
+	if id == get_multiplayer_authority():
+		queue_free()
 
 func _process(delta:float) -> void:
 	velocity.y = lerp(velocity.y, 300.0, delta * 3)
@@ -44,12 +51,11 @@ func _process(delta:float) -> void:
 	move_and_slide()
 	
 	var last_chunk : Vector2i = cxy
-	cxy	= surface.global_to_chunk(global_position)
+	cxy = surface.global_to_chunk(global_position)
 	if cxy != last_chunk: load_chunks()
 
 func load_chunks() -> void:
-	var peer_id : int = multiplayer.get_unique_id()
-	if !(is_multiplayer_authority() or peer_id == 1): return
+	if !multiplayer.is_server(): return
 	
 	var rnge : PackedInt32Array = range(1 - chunk_radius, chunk_radius)
 	
@@ -57,4 +63,4 @@ func load_chunks() -> void:
 	for offset_x : int in rnge: for offset_y : int in rnge:
 		offset_xy[0] = offset_x + cxy[0]
 		offset_xy[1] = offset_y + cxy[1]
-		surface.send_or_generate_chunk(peer_id, offset_xy)
+		surface.request_chunk(get_multiplayer_authority(), offset_xy)

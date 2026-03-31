@@ -10,7 +10,7 @@ var launch_args : Dictionary[String, String] = {}
 
 func when_possible(do:Callable, condition:bool, event:Signal, ...args:Array) -> void:
 	if !condition: event.connect(do, CONNECT_ONE_SHOT)
-	else: do.call(args)
+	else: do.callv(args)
 
 func check_disconnect(event:Signal, callable:Callable) -> void:
 	if event.is_connected(callable): event.disconnect(callable)

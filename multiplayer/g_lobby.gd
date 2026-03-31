@@ -2,6 +2,7 @@ extends Node
 
 @warning_ignore("unused_signal")
 signal connection_status_changed(to:MultiplayerPeer.ConnectionStatus)
+signal peer_disconnected(id:int)
 
 var connection_status : MultiplayerPeer.ConnectionStatus:
 	set(x):
@@ -39,7 +40,7 @@ func host(port:int=default_port) -> bool:
 		OK:
 			multiplayer.multiplayer_peer = peer
 			multiplayer.peer_connected.connect(on_peer_connected)
-			multiplayer.peer_disconnected.connect(remove_player)
+			multiplayer.peer_disconnected.connect(on_peer_disconnected)
 			#multiplayer.peer_disconnected.connect()
 			on_peer_connected(1)
 			
@@ -68,7 +69,7 @@ func join(address:String="localhost", port:int=default_port) -> bool:
 		ERR_ALREADY_IN_USE: ErrorPopup.show_with("Multiplayer peer already in use.")
 		OK:
 			multiplayer.multiplayer_peer = peer
-			multiplayer.peer_disconnected.connect(remove_player)
+			multiplayer.peer_disconnected.connect(on_peer_disconnected)
 			multiplayer.server_disconnected.connect(quit)
 			
 			DisplayServer.window_set_title.call_deferred(str(address, ":", port))
@@ -109,7 +110,7 @@ func start_game() -> void:
 
 func quit() -> void:
 	## ffs. 
-	Util.check_disconnect(multiplayer.peer_disconnected, remove_player)
+	Util.check_disconnect(multiplayer.peer_disconnected, on_peer_disconnected)
 	Util.check_disconnect(multiplayer.peer_connected, on_peer_connected)
 	Util.check_disconnect(multiplayer.server_disconnected, quit)
 	
@@ -119,8 +120,9 @@ func quit() -> void:
 	players.clear()
 	Surfaces.clear()
 
-func remove_player(id:int) -> void: 
+func on_peer_disconnected(id:int) -> void: 
 	if players.has(id):
+		peer_disconnected.emit(id)
 		HUD.chat.add_message(tr("msg_player_disconnected") % players[id].nickname)
 		players.erase(id)
 

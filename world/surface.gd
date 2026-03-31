@@ -60,14 +60,24 @@ static func deserialize(json:String) -> Surface:
 	return s
 
 
+## Places tiles from serialized chunk data.
+## If chunk data is empty, generates the chunk instead.
 func deserialize_chunk_tiles(cxy:Vector2i, chunk:Array) -> void:
+	if chunk.is_empty(): 
+		generate_chunk(cxy)
+		return
+	
 	var mxy : Vector2i = Vector2i()
 	for mx in chunk_size[0]: for my in chunk_size[1]:
 		mxy[0] = cxy[0] * chunk_size[0] + mx
 		mxy[1] = cxy[1] * chunk_size[1] + my
 		deserialize_tile(mxy, chunk[mx][my])
 
-func serialize_chunk_tiles(cxy:Vector2i) -> Array[Array]:
+## Puts chunk data into a format that can be sent over network. 
+## Returns empty data when the chunk can be generated.
+func serialize_chunk_tiles(cxy:Vector2i) -> Array:
+	if !used_chunks.has(cxy): return Array()
+	
 	var mxy : Vector2i = Vector2i()
 	var chunk : Array[Array]
 	chunk.resize(chunk_size[0])
@@ -96,25 +106,23 @@ func deserialize_tile(mxy:Vector2i, tile:int) -> void:
 
 
 #region networking
-func send_or_generate_chunk(peer_id:int, cxy:Vector2i) -> void:
-	if !cxy in used_chunks: 
-		generate_chunk(cxy)
-	elif multiplayer.get_unique_id() == 1 && peer_id != 1:
-		rpc_send_chunk.rpc_id(peer_id, serialize_chunk_tiles(cxy), cxy)
+func request_chunk(peer_id:int, cxy:Vector2i) -> void:
+	if multiplayer.is_server():
+		rpc_place_chunk.rpc_id(peer_id, cxy, serialize_chunk_tiles(cxy))
 
-@rpc("authority", "call_remote", "reliable")
-func rpc_send_chunk(chunk:Array[Array], cxy:Vector2i) -> void: deserialize_chunk_tiles(cxy, chunk)
+@rpc("call_local")
+func rpc_place_chunk(cxy:Vector2i, chunk:Array) -> void: deserialize_chunk_tiles(cxy, chunk)
 
 
 ##TODO send only to players who are loading these chunks
 ##TODO send serialized tile
-@rpc("any_peer", "call_local", "reliable")
+@rpc("any_peer", "call_local")
 func rpc_place_tile(mxy:Vector2i) -> void:
 	set_cell(mxy, 1, Vector2i.ZERO)
 	mark_chunk_used_map(mxy)
 
 ##TODO send only to players who are loading these chunks
-@rpc("any_peer", "call_local", "reliable")
+@rpc("any_peer", "call_local")
 func rpc_remove_tile(mxy:Vector2i) -> void:
 	erase_cell(mxy)
 	mark_chunk_used_map(mxy)
@@ -124,6 +132,7 @@ func rpc_remove_tile(mxy:Vector2i) -> void:
 #region generation
 func generate_chunk(cxy:Vector2i) -> void:
 	noise.seed = generation_seed
+	used_chunks.erase(cxy)
 	var mxy : Vector2i = Vector2i()
 	for mx in chunk_size[0]: for my in chunk_size[1]:
 		mxy[0] = cxy[0] * chunk_size[0] + mx
