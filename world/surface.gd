@@ -108,6 +108,9 @@ func deserialize_tile(mxy:Vector2i, tile:int) -> void:
 #region networking
 func request_chunk(peer_id:int, cxy:Vector2i) -> void:
 	if multiplayer.is_server():
+		# Client can place blocks in empty chunks and override the whole damn thing otherwise.
+		if !used_chunks.has(cxy): generate_chunk(cxy)
+		
 		rpc_place_chunk.rpc_id(peer_id, cxy, serialize_chunk_tiles(cxy))
 
 @rpc("call_local")
