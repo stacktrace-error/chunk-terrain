@@ -3,6 +3,8 @@ class_name PlayerBody
 
 signal surface_changed(surface:Surface)
 
+@export var name_label : RichTextLabel
+
 var surface : Surface:
 	set(x):
 		if surface != x:
@@ -13,13 +15,19 @@ var cxy : Vector2i
 const chunk_radius : int = 8
 
 static func create(id:int, mul_api:MultiplayerAPI) -> PlayerBody:
-	var body : PlayerBody= preload("res://entities/player/player_body.tscn").instantiate()
+	var body : PlayerBody = preload("res://entities/player/player_body.tscn").instantiate()
 	body.set_multiplayer_authority(id)
 	body.name = str(id)
 	body.surface_changed.connect(Surfaces.set_active_surface)
 	
-	Lobby.peer_disconnected.connect(body.on_peer_disconnected)
+	# stinky line of code that:
+	# - doesn't show up in the stacktrace.
+	# - causes no errors.
+	# - SPECIFICALLY crashes session 3 SOMETIMES because the function no longer returns a body??????
+	# - does not do that when commented out.
+	body.name_label.text = Lobby.get_colored_name(id)
 	
+	Lobby.peer_disconnected.connect(body.on_peer_disconnected)
 	if mul_api.get_unique_id() == id: Camera.target = body
 	
 	return body

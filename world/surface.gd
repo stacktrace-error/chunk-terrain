@@ -116,7 +116,7 @@ func request_chunks(peer_id:int, cxy:Vector2i, c_radius:int) -> void:
 
 ## Has to be called from the server's side. TODO bad name
 func request_chunk(peer_id:int, cxy:Vector2i) -> void:
-	if multiplayer.is_server() and !loaded_chunks.has(cxy):
+	if multiplayer.is_server():
 		# Client can place blocks in empty chunks and override the whole damn thing otherwise.
 		if !used_chunks.has(cxy): generate_chunk(cxy)
 		
@@ -152,6 +152,7 @@ func rpc_place_tile(mxy:Vector2i, tile:int) -> void:
 func generate_chunk(cxy:Vector2i) -> void:
 	noise.seed = generation_seed
 	used_chunks.erase(cxy)
+	mark_chunk_loaded(cxy)
 	var mxy : Vector2i = Vector2i()
 	for mx in chunk_size[0]: for my in chunk_size[1]:
 		mxy[0] = cxy[0] * chunk_size[0] + mx

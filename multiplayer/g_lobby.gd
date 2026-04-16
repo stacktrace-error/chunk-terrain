@@ -4,17 +4,17 @@ extends Node
 signal connection_status_changed(to:MultiplayerPeer.ConnectionStatus)
 signal peer_disconnected(id:int)
 
-var connection_status : MultiplayerPeer.ConnectionStatus:
+var connection_status : MultiplayerPeer.ConnectionStatus = 0:
 	set(x):
 		if(connection_status != x):
 			connection_status = x
 			connection_status_changed.emit(x)
 
 var uid : String
-
 var players : Dictionary[int, Dictionary] = {}
 
 const default_port : int = 13500
+
 
 func _ready() -> void:
 	var args : Dictionary[String, String] = Util.launch_args
@@ -35,7 +35,6 @@ func host_parse_port(port_string:String="") -> bool:
 	var port : int = default_port
 	if !port_string.is_empty(): port = port_string.to_int()
 	return host(port)
-
 func host(port:int=default_port) -> bool:
 	var peer : ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 	var error : Error = peer.create_server(port)
@@ -60,7 +59,6 @@ func join_parse_port(address:String) -> bool:
 	
 	if split.size() > 1: return join(split[0], split[1].to_int())
 	return join(address, default_port)
-
 func join(address:String="localhost", port:int=default_port) -> bool:
 	quit()
 	
@@ -70,28 +68,39 @@ func join(address:String="localhost", port:int=default_port) -> bool:
 		ERR_CANT_CREATE: ErrorPopup.show_with(str("Couldn't create client for ", address, ":", port, "."))
 		ERR_ALREADY_IN_USE: ErrorPopup.show_with("Multiplayer peer already in use.")
 		OK:
+			DisplayServer.window_set_title.call_deferred(str(address, ":", port))
+			
 			multiplayer.multiplayer_peer = peer
-			multiplayer.connected_to_server.connect(send_player)
 			multiplayer.server_disconnected.connect(quit)
+			multiplayer.connected_to_server.connect(send_player)
 			multiplayer.peer_disconnected.connect(on_peer_disconnected)
 			
-			DisplayServer.window_set_title.call_deferred(str(address, ":", port))
+			connection_status = 1
+			
 			return true
 	return false
 
 
 func send_player() -> void:
-	var nick : String = uid if Util.launch_args.has("uid") else Settings.read("nickname")
+	var override : bool = Util.launch_args.has("uid")
+	var nick : String = uid if override else Settings.read("nickname")
+	var color : String = "bebebe" if override else Settings.read("nickname_color")
 	
 	rpc_send_player.rpc_id(1, {
 		"uid" = uid,
 		"nickname" = nick,
-		"nickname_color" = Settings.read("nickname_color"),
+		"nickname_color" = color,
 	})
 
 @rpc("any_peer", "call_local")
 func rpc_send_player(player:Dictionary) -> void:
 	if !multiplayer.is_server(): return
+	
+	# rudimentary ban
+	#if player.uid == "client 1": 
+		#multiplayer.multiplayer_peer.disconnect_peer(multiplayer.get_remote_sender_id())
+		#return
+	
 	player["id"] = multiplayer.get_remote_sender_id()
 	on_player_received(player)
 
@@ -109,7 +118,7 @@ func on_player_received(player:Dictionary) -> void:
 @rpc("call_local")
 func rpc_add_player(player:Dictionary) -> void:
 	if players.get(player.id):
-		print("attempted to add duplicate player " + player.id)
+		print(str("attempted to add duplicate player ", player.id))
 		return
 	players[player.id] = player
 	

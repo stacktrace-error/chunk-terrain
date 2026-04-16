@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://dc8dgp5nmtxbf" path="res://ui/player_info.tscn" id="2_0dkrt"]
 
 [node name="MainMenu" type="CanvasLayer" unique_id=2060055621]
+visible = false
 script = ExtResource("1_qtwoh")
 
 [node name="Panel" type="Panel" parent="." unique_id=1106468792]

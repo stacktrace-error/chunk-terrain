@@ -2,21 +2,21 @@ extends CanvasLayer
 
 
 func _ready() -> void:
-	if Surfaces.has_world: hide()
-	
 	Surfaces.world_created.connect(hide)
 	Surfaces.world_closed.connect(show)
 	
-	%JoinAddress.text = Settings.read("last_join_ip")
-	
-	visibility_changed.connect(on_visibility_changed)
+	hide()
+	#visibility_changed.connect(on_visibility_changed)
+	if !Surfaces.has_world: show()
 	on_visibility_changed()
+	
+	%JoinAddress.text = Settings.read("last_join_ip")
 
 func on_join_submitted() -> void:
 	Lobby.join_parse_port(%JoinAddress.text)
 
 func on_visibility_changed() -> void:
-	if visible:
+	if visible && Lobby.connection_status == 0:
 		DisplayServer.window_set_title.call_deferred("main menu")
 
 

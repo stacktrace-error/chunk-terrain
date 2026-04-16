@@ -12,10 +12,11 @@ properties/0/path = NodePath(".:position")
 properties/0/spawn = false
 properties/0/replication_mode = 1
 
-[node name="PlayerBody" type="CharacterBody2D" unique_id=2068877907]
+[node name="PlayerBody" type="CharacterBody2D" unique_id=2068877907 node_paths=PackedStringArray("name_label")]
 collision_layer = 32776
 platform_floor_layers = 4294967041
 script = ExtResource("1_xhb16")
+name_label = NodePath("NameLabel")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=666932845]
 shape = SubResource("CapsuleShape2D_oul6g")
@@ -27,3 +28,27 @@ texture = ExtResource("2_0437v")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1070237324]
 replication_config = SubResource("SceneReplicationConfig_abrql")
+
+[node name="NameLabel" type="RichTextLabel" parent="." unique_id=1333028570]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -162.0
+offset_top = -42.0
+offset_right = 162.0
+offset_bottom = -26.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 14
+theme_override_font_sizes/bold_font_size = 14
+theme_override_font_sizes/bold_italics_font_size = 14
+theme_override_font_sizes/italics_font_size = 14
+theme_override_font_sizes/mono_font_size = 14
+bbcode_enabled = true
+text = "I am a player"
+fit_content = true
+horizontal_alignment = 1
+vertical_alignment = 2

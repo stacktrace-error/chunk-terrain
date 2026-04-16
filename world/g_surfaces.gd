@@ -42,7 +42,7 @@ func on_peer_connected(id:int) -> void:
 		rpc_add_stubs.rpc_id(id, to_stubs())
 		
 		for player : int in Lobby.players:
-			rpc_spawn_body.rpc_id(id, player)
+			if player != id: rpc_spawn_body.rpc_id(id, player)
 		
 		rpc_spawn_body.rpc(id)
 
