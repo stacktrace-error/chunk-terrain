@@ -7,7 +7,7 @@ func _ready() -> void:
 	
 	%SaveDialog.file_selected.connect(Surfaces.save_as)
 	
-	%HostPort.text = Settings.read_setting("last_host_port")
+	%HostPort.text = Settings.read("last_host_port")
 	
 	Surfaces.world_closed.connect(hide)
 	hide()

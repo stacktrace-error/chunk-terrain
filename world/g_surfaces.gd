@@ -115,11 +115,7 @@ func to_stubs() -> Array[String]:
 
 func clear() -> void:
 	for child : Node in get_children(): child.free()
-	
 	has_world = false
-	
-	#spawn_point = null
-	#warper = null
 
 func get_parent_surface(node:Node) -> Surface:
 	while node:

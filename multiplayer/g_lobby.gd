@@ -10,16 +10,19 @@ var connection_status : MultiplayerPeer.ConnectionStatus:
 			connection_status = x
 			connection_status_changed.emit(x)
 
+var uid : String
+
 var players : Dictionary[int, Dictionary] = {}
 
 const default_port : int = 13500
 
 func _ready() -> void:
 	var args : Dictionary[String, String] = Util.launch_args
-	if args.has("host"):
-		host_parse_port(args["host"])
-	elif args.has("join"): 
-		join_parse_port(args["join"])
+	if args.has("host"): host_parse_port(args["host"])
+	elif args.has("join"): join_parse_port(args["join"])
+	
+	if args.has("uid"): uid = args["uid"]
+	else: uid = Settings.read("uid")
 
 func _process(_delta: float) -> void:
 	var p : MultiplayerPeer = multiplayer.multiplayer_peer
@@ -27,7 +30,7 @@ func _process(_delta: float) -> void:
 
 
 func host_parse_port(port_string:String="") -> bool:
-	Settings.write_setting("last_host_port", port_string)
+	Settings.write("last_host_port", port_string)
 	
 	var port : int = default_port
 	if !port_string.is_empty(): port = port_string.to_int()
@@ -51,7 +54,7 @@ func host(port:int=default_port) -> bool:
 
 
 func join_parse_port(address:String) -> bool:
-	Settings.write_setting("last_join_ip", address)
+	Settings.write("last_join_ip", address)
 	
 	var split : PackedStringArray = address.rsplit(":", false, 1)
 	
@@ -78,7 +81,13 @@ func join(address:String="localhost", port:int=default_port) -> bool:
 
 
 func send_player() -> void:
-	rpc_send_player.rpc_id(1, Settings.get_player())
+	var nick : String = uid if Util.launch_args.has("uid") else Settings.read("nickname")
+	
+	rpc_send_player.rpc_id(1, {
+		"uid" = uid,
+		"nickname" = nick,
+		"nickname_color" = Settings.read("nickname_color"),
+	})
 
 @rpc("any_peer", "call_local")
 func rpc_send_player(player:Dictionary) -> void:
