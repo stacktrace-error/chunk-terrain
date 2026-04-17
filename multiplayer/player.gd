@@ -1,12 +1,13 @@
 class_name Player extends Node
 
+signal disconnecting
+
 @export var id : int
 @export var uid : int
 @export var nickname : String
 @export var color : Color
 
-
-static func create_as_byte_array() -> PackedByteArray:
+static func create_as_packet() -> PackedByteArray:
 	var bytes : PackedByteArray = PackedByteArray()
 	
 	var override : bool = Util.launch_args.has("uid")
@@ -14,21 +15,38 @@ static func create_as_byte_array() -> PackedByteArray:
 	var col : Color = Color.GRAY if override else Color(Settings.read("player_color"))
 	var nick : String = Util.launch_args["uid"][1] if override else Settings.read("player_name")
 	
-	bytes.resize(8)
-	bytes.encode_u32(0, u.to_int())
-	bytes.encode_s32(4, col.to_rgba32())
+	bytes.resize(9)
+	bytes[0] = 255 #packet "type" byte
+	bytes.encode_u32(1, u.to_int())
+	bytes.encode_s32(5, col.to_rgba32())
 	bytes.append_array(nick.to_utf8_buffer())
 	
 	return bytes
 
-static func from_byte_array(data:PackedByteArray) -> Player:
-	var player : Player = new()
+static func from_packet(data:PackedByteArray) -> Player:
+	var player : Player = preload("res://multiplayer/player.tscn").instantiate()
 	
-	player.uid = data.decode_u32(0)
-	player.color = Color(data.decode_u32(4))
-	player.nickname = data.slice(8).get_string_from_utf8()
+	player.uid = data.decode_u32(1)
+	player.color = Color(data.decode_u32(5))
+	player.nickname = data.slice(9).get_string_from_utf8()
 	
 	return player
+
+func _ready() -> void:
+	if !Lobby.players.has(id):
+		Lobby.players[id] = self
+		HUD.chat.add_message(tr("msg_player_connected") % nickname)
+		
+		Util.when_possible(Surfaces.spawn_body.bind(id), Surfaces.has_world, Surfaces.world_created)
+	else:
+		print("attempted to spawn duplicate player for " + str(id))
+		queue_free()
+
+func free() -> void:
+	disconnecting.emit()
+	HUD.chat.add_message(tr("msg_player_disconnected") % nickname)
+	Lobby.players.erase(id)
+	super.free()
 
 func colored_name() -> String:
 	return str("[color=", color.to_html(), "]", nickname, "[/color]")

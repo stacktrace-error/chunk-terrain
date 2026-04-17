@@ -14,7 +14,7 @@ func _ready() -> void:
 
 
 func on_host_submitted() -> void:
-	Lobby.host_parse_port(%HostPort.text)
+	Lobby.host(%HostPort.text)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause_menu"):

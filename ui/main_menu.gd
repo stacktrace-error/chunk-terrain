@@ -13,7 +13,7 @@ func _ready() -> void:
 	%JoinAddress.text = Settings.read("last_join_ip")
 
 func on_join_submitted() -> void:
-	Lobby.join_parse_port(%JoinAddress.text)
+	Lobby.join(%JoinAddress.text)
 
 func on_visibility_changed() -> void:
 	if visible && Lobby.connection_status == 0:

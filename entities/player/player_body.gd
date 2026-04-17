@@ -15,19 +15,16 @@ var cxy : Vector2i
 const chunk_radius : int = 8
 
 static func create(id:int, mul_api:MultiplayerAPI) -> PlayerBody:
+	var player : Player = Lobby.players[id]
 	var body : PlayerBody = preload("res://entities/player/player_body.tscn").instantiate()
+	
 	body.set_multiplayer_authority(id)
-	body.name = str(id)
+	body.name = str(player.id)
+	body.name_label.text = player.colored_name()
+	
 	body.surface_changed.connect(Surfaces.set_active_surface)
+	player.disconnecting.connect(body.on_player_disconnecting)
 	
-	# stinky line of code that:
-	# - doesn't show up in the stacktrace.
-	# - causes no errors.
-	# - SPECIFICALLY crashes session 3 SOMETIMES because the function no longer returns a body??????
-	# - does not do that when commented out.
-	body.name_label.text = Lobby.get_colored_name(id)
-	
-	Lobby.peer_disconnected.connect(body.on_peer_disconnected)
 	if mul_api.get_unique_id() == id: Camera.target = body
 	
 	return body
@@ -36,10 +33,9 @@ func _enter_tree() -> void:
 	surface = Surfaces.get_parent_surface(self)
 	load_chunks()
 
-func on_peer_disconnected(id:int) -> void:
+func on_player_disconnecting(id:int) -> void:
 	if id == get_multiplayer_authority():
 		queue_free()
-		
 
 func _process(delta:float) -> void:
 	velocity.y = lerp(velocity.y, 300.0, delta * 3)

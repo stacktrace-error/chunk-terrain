@@ -9,12 +9,12 @@ static func create(player:int, g_pos:Vector2, radius:float=-1, lifetime:float=20
 	ping.setup(player, g_pos, radius, lifetime)
 	return ping
 
-func setup(player:int, g_pos:Vector2, radius:float=-1, lifetime:float=20) -> void:
+func setup(peer_id:int, g_pos:Vector2, radius:float=-1, lifetime:float=20) -> void:
 	global_position = g_pos
 	
 	if radius < 0: radius = default_radius
 	
-	%Text.text = Lobby.get_colored_name(player)
+	%Text.text = Lobby.players[peer_id].colored_name()
 	%Text.position.y = -50 - radius * 0.44
 	
 	var p : PackedVector2Array = points.duplicate()
@@ -22,7 +22,7 @@ func setup(player:int, g_pos:Vector2, radius:float=-1, lifetime:float=20) -> voi
 	
 	%Circle.points = p
 	%CircleColor.points = p
-	%CircleColor.default_color = Color(Lobby.players[player].nickname_color)
+	%CircleColor.default_color = Color(Lobby.players[peer_id].color)
 	
 	var tween : Tween = create_tween()
 	tween.tween_interval(lifetime - fade_time)

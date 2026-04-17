@@ -37,22 +37,17 @@ func _ready() -> void:
 		Lobby.start_game()
 
 
-func on_peer_connected(id:int) -> void:
-	if has_world and !id == 1: 
-		rpc_add_stubs.rpc_id(id, to_stubs())
-		
-		for player : int in Lobby.players:
-			if player != id: rpc_spawn_body.rpc_id(id, player)
-		
-		rpc_spawn_body.rpc(id)
+func send_stub_to(id:int) -> void:
+	if has_world && !id == 1: rpc_add_stubs.rpc_id(id, to_stubs())
 
 func on_game_started() -> void:
 	rpc_add_stubs.rpc(to_stubs())
-	for player : int in Lobby.players:
-		rpc_spawn_body.rpc(player)
 
 @rpc("call_local")
 func rpc_spawn_body(id:int) -> void:
+	spawn_body(id)
+
+func spawn_body(id:int) -> void:
 	active_surface.add_child(PlayerBody.create(id, multiplayer))
 
 #region creation/deserialization
