@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://b24erumrkcrey"]
+
+[ext_resource type="Script" uid="uid://cpxj0kmeju1va" path="res://multiplayer/player.gd" id="1_kuyp6"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_kuyp6"]
+properties/0/path = NodePath(".:id")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:uid")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:nickname")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:color")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+
+[node name="Player" type="Node" unique_id=1784848499]
+script = ExtResource("1_kuyp6")
+metadata/_custom_type_script = "uid://cpxj0kmeju1va"
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=639269282]
+replication_config = SubResource("SceneReplicationConfig_kuyp6")

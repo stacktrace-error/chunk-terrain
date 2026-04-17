@@ -1,12 +1,13 @@
 extends Node
 
 ## Contains launch arguments in an easily accessible format. Ignores leading gibberish.
-## Arguments like " ggffa!!!!! --host 6567 8882 --scene=gtgftgdff" are turned into
+## Arguments like " ggffa!!!!! --host 6567 8882 --scene=gtgftgdff --fuck" are turned into
 ## {
-##     "host" = "6567 8882",
-##     "scene" = "gtgftgdff"
+##     "host" = ["6567", "8882"],
+##     "scene" = ["gtgftgdff"],
+##     "fuck" = []
 ## }
-var launch_args : Dictionary[String, String] = {}
+var launch_args : Dictionary[String, PackedStringArray] = {}
 
 func when_possible(do:Callable, condition:bool, event:Signal, ...args:Array) -> void:
 	if !condition: event.connect(do, CONNECT_ONE_SHOT)
@@ -34,9 +35,8 @@ func _ready() -> void:
 
 			key = key.trim_prefix("--")
 			last_key = key
-			launch_args[key] = value
+			launch_args[key] = [value] if !value.is_empty() else []
 		elif last_key:
-			if launch_args[last_key] != "": arg = " " + arg
-			launch_args[last_key] += arg
+			launch_args[last_key].append(arg)
 		
 		i += 1

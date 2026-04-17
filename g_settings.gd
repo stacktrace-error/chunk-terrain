@@ -2,8 +2,8 @@ extends Node
 
 var settings : Dictionary = {
 	"uid" = "",
-	"nickname" = "",
-	"nickname_color" = "33ff33",
+	"player_name" = "",
+	"player_color" = "33ff33",
 	"last_join_ip" = "",
 	"last_host_port" = ""
 }

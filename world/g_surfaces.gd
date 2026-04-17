@@ -27,10 +27,10 @@ var active_surface : Surface:
 		x.show()
 
 func _ready() -> void:
-	var args : Dictionary[String, String] = Util.launch_args
+	var args : Dictionary[String, PackedStringArray] = Util.launch_args
 	
 	if args.has("load"): 
-		load_from(args["load"])
+		load_from(args["load"][0])
 		Lobby.start_game()
 	elif args.has("new-game"): 
 		new_game()

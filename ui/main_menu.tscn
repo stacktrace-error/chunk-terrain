@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://b50nne4g7wvf8"]
 
 [ext_resource type="Script" uid="uid://qthtmxf0u1ta" path="res://ui/main_menu.gd" id="1_qtwoh"]
-[ext_resource type="PackedScene" uid="uid://dc8dgp5nmtxbf" path="res://ui/player_info.tscn" id="2_0dkrt"]
+[ext_resource type="PackedScene" uid="uid://dc8dgp5nmtxbf" path="res://ui/edit_player_panel.tscn" id="2_0dkrt"]
 
 [node name="MainMenu" type="CanvasLayer" unique_id=2060055621]
 visible = false
