@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://8ed36o77rnpo"]
+
+[ext_resource type="Script" uid="uid://3veqymigrnck" path="res://world/surface.gd" id="1_7y7rv"]
+
+[node name="Surface" type="TileMapLayer" unique_id=346111104]
+script = ExtResource("1_7y7rv")
+metadata/_custom_type_script = "uid://3veqymigrnck"
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=1482827224]
+_spawnable_scenes = PackedStringArray("uid://cye331dhe8nxs")
+spawn_path = NodePath("..")

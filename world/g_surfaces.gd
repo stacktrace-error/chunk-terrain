@@ -29,22 +29,12 @@ var active_surface : Surface:
 func _ready() -> void:
 	var args : Dictionary[String, PackedStringArray] = Util.launch_args
 	
-	if args.has("load"): 
-		load_from(args["load"][0])
-		Lobby.start_game()
-	elif args.has("new-game"): 
-		new_game()
-		Lobby.start_game()
+	if args.has("load"): load_from(args["load"][0])
+	elif args.has("new-game"): new_game()
 
 
-func send_stub_to(id:int) -> void:
+func on_peer_connected(id:int) -> void:
 	if has_world && !id == 1: rpc_add_stubs.rpc_id(id, to_stubs())
-
-func on_game_started() -> void:
-	rpc_add_stubs.rpc(to_stubs())
-
-@rpc("call_local")
-func rpc_spawn_body(id:int) -> void:
 	spawn_body(id)
 
 func spawn_body(id:int) -> void:

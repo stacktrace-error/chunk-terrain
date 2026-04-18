@@ -19,7 +19,7 @@ const chunk_size : Vector2i = Vector2i(16, 16)
 		#generate_chunk(cxy)
 
 static func create(_name:String, _seed:int) -> Surface:
-	var s : Surface = Surface.new()
+	var s : Surface = load("res://world/surface.tscn").instantiate()
 	s.tile_set = load("res://assets/tiles/tileset.tres")
 	s.noise = load("res://assets/new_fast_noise_lite.tres")
 	s.generation_seed = _seed

@@ -36,8 +36,6 @@ func _ready() -> void:
 	if !Lobby.players.has(id):
 		Lobby.players[id] = self
 		HUD.chat.add_message(tr("msg_player_connected") % nickname)
-		
-		Util.when_possible(Surfaces.spawn_body.bind(id), Surfaces.has_world, Surfaces.world_created)
 	else:
 		print("attempted to spawn duplicate player for " + str(id))
 		queue_free()

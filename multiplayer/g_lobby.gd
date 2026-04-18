@@ -19,6 +19,8 @@ func _ready() -> void:
 	var args : Dictionary[String, PackedStringArray] = Util.launch_args
 	if args.has("host"): host(args["host"][0])
 	elif args.has("join"): join(args["join"][0])
+	
+	if args.has("load") or args.has("new_game"): start_game()
 
 
 func _process(_delta: float) -> void:
@@ -41,8 +43,6 @@ func host(port_var:Variant=default_port) -> void:
 	var peer : ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 	if peer.create_server(port) == OK:
 		multiplayer.multiplayer_peer = peer
-		
-		spawn_player(1, Player.create_as_packet())
 		
 		DisplayServer.window_set_title.call_deferred("hosting")
 	else:
@@ -96,15 +96,16 @@ func on_peer_authenticating(id:int) -> void:
 	multiplayer.send_auth(id, "g".to_utf8_buffer())
 
 func on_peer_connected(id:int) -> void:
-	Surfaces.send_stub_to(id)
+	Surfaces.on_peer_connected(id)
 
 func on_peer_disconnected(id:int) -> void: 
 	if players.has(id):
 		players[id].queue_free()
 
 func start_game() -> void:
-	if players.is_empty(): spawn_player(1, Player.create_as_packet())
-	Surfaces.on_game_started()
+	if players.is_empty(): 
+		spawn_player(1, Player.create_as_packet())
+		Surfaces.on_peer_connected(1)
 
 ## ffs. 
 func disconnect_signals() -> void:

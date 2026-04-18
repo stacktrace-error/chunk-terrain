@@ -24,6 +24,10 @@ func _ready() -> void:
 	while i < args.size():
 		var arg : String = args[i]
 		
+		if arg == "#": 
+			launch_args.clear()
+			return
+		
 		if arg.contains("--"):
 			var key : String = arg
 			var value : String = ""

@@ -22,8 +22,10 @@ func on_visibility_changed() -> void:
 
 func _on_load_dialog_file_selected(path: String) -> void:
 	Surfaces.load_from(path)
+	if(%HostCheckbox.button_pressed): Lobby.host(%HostPort.text)
 	Lobby.start_game()
 
 func _on_new_game_pressed() -> void:
 	Surfaces.new_game()
+	if(%HostCheckbox.button_pressed): Lobby.host(%HostPort.text)
 	Lobby.start_game()
