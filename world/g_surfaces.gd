@@ -39,7 +39,9 @@ func on_peer_connected(id:int) -> void:
 	sync(id)
 
 func sync(id:int) -> void:
-	if has_world && !id == 1: rpc_place_surfaces.rpc_id(id, serialize_sync())
+	if has_world && !id == 1: 
+		rpc_place_surfaces.rpc_id(id, serialize_sync())
+		if Lobby.players[id].body: Lobby.players[id].body.load_chunks()
 
 func spawn_body(id:int) -> void:
 	active_surface.add_child(PlayerBody.create(id))

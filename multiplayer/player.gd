@@ -7,6 +7,8 @@ signal disconnecting
 @export var nickname : String
 @export var color : Color
 
+var body : PlayerBody
+
 static func create_as_packet() -> PackedByteArray:
 	var bytes : PackedByteArray = PackedByteArray()
 	

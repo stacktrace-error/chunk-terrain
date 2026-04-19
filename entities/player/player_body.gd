@@ -35,6 +35,7 @@ static func create(peer_id:int) -> PlayerBody:
 func _enter_tree() -> void:
 	surface = Surfaces.get_parent_surface(self)
 	if multiplayer.get_unique_id() == id: Camera.target = self
+	Lobby.players[id].body = self
 	load_chunks()
 
 func on_player_disconnecting(peer_id:int) -> void:
