@@ -11,6 +11,7 @@ func _ready() -> void:
 	on_visibility_changed()
 	
 	%JoinAddress.text = Settings.read("last_join_ip")
+	%HostPort.text = Settings.read("last_host_port")
 
 func on_join_submitted() -> void:
 	Lobby.join(%JoinAddress.text)
