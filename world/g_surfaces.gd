@@ -26,6 +26,7 @@ var active_surface : Surface:
 		x.collision_enabled = true
 		x.show()
 
+
 func _ready() -> void:
 	var args : Dictionary[String, PackedStringArray] = Util.launch_args
 	
@@ -34,11 +35,15 @@ func _ready() -> void:
 
 
 func on_peer_connected(id:int) -> void:
-	if has_world && !id == 1: rpc_add_stubs.rpc_id(id, to_stubs())
 	spawn_body(id)
+	sync(id)
+
+func sync(id:int) -> void:
+	if has_world && !id == 1: rpc_place_surfaces.rpc_id(id, serialize_sync())
 
 func spawn_body(id:int) -> void:
-	active_surface.add_child(PlayerBody.create(id, multiplayer))
+	active_surface.add_child(PlayerBody.create(id))
+
 
 #region creation/deserialization
 func new_game() -> void:
@@ -64,13 +69,14 @@ func load_from(path:String) -> void:
 	has_world = true
 
 @rpc
-func rpc_add_stubs(stubs:Array[String]) -> void:
-	if has_world: return
+func rpc_place_surfaces(stubs:Array[String]) -> void:
+	clear()
 	
 	for surface : String in stubs: add_child(Surface.deserialize(surface))
 	active_surface = get_child(0)
 	has_world = true
 #endregion
+
 
 #region serializiation
 func save() -> void:
@@ -82,24 +88,27 @@ func save_as(path:String) -> void:
 	
 	for child : Node in get_children():
 		if child is Surface:
-			surfaces.append(child.serialize())
+			surfaces.append(child.serialize_save())
 	
 	#print(JSON.stringify(surfaces, ""))
 	file.store_string(JSON.stringify(surfaces, ""))
 	file.close()
 	file_path = path
 
-func to_stubs() -> Array[String]:
+func serialize_sync() -> Array[String]:
 	var stubs : Array[String] = []
 	
 	for child : Node in get_children():
 		if child is Surface:
-			stubs.append(child.to_stub())
+			stubs.append(child.serialize_sync())
 	return stubs
 #endregion
 
+
 func clear() -> void:
-	for child : Node in get_children(): child.free()
+	for child : Node in get_children(): 
+		child.name = "the bell tolls"
+		child.queue_free()
 	has_world = false
 
 func get_parent_surface(node:Node) -> Surface:

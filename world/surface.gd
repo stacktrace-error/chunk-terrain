@@ -4,8 +4,6 @@ class_name Surface
 @export var noise : FastNoiseLite
 @export var generation_seed : int
 
-## The chunk coordinates of chunks that are currently loaded.
-var loaded_chunks : Dictionary[Vector2i, Variant] = {}
 ## The chunk coordinates of chunks that should be saved.
 var used_chunks : Dictionary[Vector2i, Variant] = {}
 
@@ -19,7 +17,7 @@ const chunk_size : Vector2i = Vector2i(16, 16)
 		#generate_chunk(cxy)
 
 static func create(_name:String, _seed:int) -> Surface:
-	var s : Surface = load("res://world/surface.tscn").instantiate()
+	var s : Surface = new()
 	s.tile_set = load("res://assets/tiles/tileset.tres")
 	s.noise = load("res://assets/new_fast_noise_lite.tres")
 	s.generation_seed = _seed
@@ -29,7 +27,7 @@ static func create(_name:String, _seed:int) -> Surface:
 
 #region (de)serialization
 #region full map
-func serialize() -> String:
+func serialize_save() -> String:
 	var chunks : Dictionary[String, Dictionary] = {}
 	for cxy : Vector2i in used_chunks:
 		chunks[str("[", cxy[0], ", ", cxy[1], "]")] = {
@@ -37,17 +35,29 @@ func serialize() -> String:
 			"tiles" = serialize_chunk_tiles(cxy)
 		}
 	
+	var entities : Array[Dictionary] = []
+	for child : Node in get_children():
+		if child.has_method("serialize_save"):
+			entities.append(child.serialize_save())
+	
 	return JSON.stringify({
 		"name" = name,
 		"seed" = generation_seed,
-		"chunks" = chunks
+		"chunks" = chunks,
+		"entities" = entities
 	})
 
-## Serialize this surface as a stub, meaning that it will have no chunks inside.
-func to_stub() -> String:
+## Serializes this surface as a stub, meaning that it will have no chunks inside.
+func serialize_sync() -> String:
+	var entities : Array[Dictionary] = []
+	for child : Node in get_children():
+		if child.has_method("serialize_sync"):
+			entities.append(child.serialize_sync())
+	
 	return JSON.stringify({
 		"name" = name,
 		"seed" = generation_seed,
+		"entities" = entities
 	})
 
 static func deserialize(json:String) -> Surface:
@@ -60,6 +70,17 @@ static func deserialize(json:String) -> Surface:
 			var cxy : Vector2i = Vector2i(arr[0], arr[1])
 			
 			s.deserialize_chunk_tiles(cxy, surface["chunks"][c]["tiles"])
+	
+	if surface.has("entities"):
+		for data : Dictionary in surface["entities"]:
+			#var data : Dictionary = JSON.parse_string(e)
+			var entity : Node = load(data.scene_file_path).instantiate()
+			
+			entity.name = data["name"]
+			if entity.has_method("deserialize"): entity.deserialize(data)
+			
+			s.add_child(entity)
+	
 	return s
 #endregion
 
@@ -94,7 +115,6 @@ func deserialize_chunk_tiles(cxy:Vector2i, chunk:Array) -> void:
 		return
 	
 	mark_chunk_used(cxy)
-	mark_chunk_loaded(cxy)
 	
 	var mxy : Vector2i = Vector2i()
 	for mx in chunk_size[0]: for my in chunk_size[1]:
@@ -152,7 +172,7 @@ func rpc_place_tile(mxy:Vector2i, tile:int) -> void:
 func generate_chunk(cxy:Vector2i) -> void:
 	noise.seed = generation_seed
 	used_chunks.erase(cxy)
-	mark_chunk_loaded(cxy)
+	
 	var mxy : Vector2i = Vector2i()
 	for mx in chunk_size[0]: for my in chunk_size[1]:
 		mxy[0] = cxy[0] * chunk_size[0] + mx
@@ -167,9 +187,6 @@ func generate_chunk(cxy:Vector2i) -> void:
 #region utility
 func mark_chunk_used(cxy:Vector2i) -> void: if !cxy in used_chunks: used_chunks[cxy] = null
 func mark_chunk_used_map(mxy:Vector2) -> void: mark_chunk_used(map_to_chunk(mxy))
-
-func mark_chunk_loaded(cxy:Vector2i) -> void: if !cxy in loaded_chunks: loaded_chunks[cxy] = null
-func mark_chunk_loaded_map(mxy:Vector2) -> void: mark_chunk_loaded(map_to_chunk(mxy))
 
 func map_to_chunk(mxy:Vector2) -> Vector2i: return (mxy / (chunk_size as Vector2)).floor()
 func local_to_chunk(lxy:Vector2) -> Vector2i: return map_to_chunk(local_to_map(lxy))

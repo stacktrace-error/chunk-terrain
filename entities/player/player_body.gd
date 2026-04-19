@@ -5,6 +5,11 @@ signal surface_changed(surface:Surface)
 
 @export var name_label : RichTextLabel
 
+var id : int:
+	set(x):
+		id = x
+		set_multiplayer_authority(id)
+
 var surface : Surface:
 	set(x):
 		if surface != x:
@@ -14,27 +19,26 @@ var cxy : Vector2i
 
 const chunk_radius : int = 8
 
-static func create(id:int, mul_api:MultiplayerAPI) -> PlayerBody:
-	var player : Player = Lobby.players[id]
+static func create(peer_id:int) -> PlayerBody:
+	var player : Player = Lobby.players[peer_id]
 	var body : PlayerBody = preload("res://entities/player/player_body.tscn").instantiate()
 	
-	body.set_multiplayer_authority(id)
+	body.id = peer_id
 	body.name = str(player.id)
 	body.name_label.text = player.colored_name()
 	
 	body.surface_changed.connect(Surfaces.set_active_surface)
 	player.disconnecting.connect(body.on_player_disconnecting)
 	
-	if mul_api.get_unique_id() == id: Camera.target = body
-	
 	return body
 
 func _enter_tree() -> void:
 	surface = Surfaces.get_parent_surface(self)
+	if multiplayer.get_unique_id() == id: Camera.target = self
 	load_chunks()
 
-func on_player_disconnecting(id:int) -> void:
-	if id == get_multiplayer_authority():
+func on_player_disconnecting(peer_id:int) -> void:
+	if peer_id == get_multiplayer_authority():
 		queue_free()
 
 func _process(delta:float) -> void:
@@ -60,7 +64,22 @@ func load_chunks() -> void:
 	cxy = surface.global_to_chunk(global_position)
 	if cxy != last_chunk: surface.request_chunks(get_multiplayer_authority(), cxy, chunk_radius)
 
-func serialize() -> Dictionary[String, Variant]:
-	return {}
 
-#func dese
+#func serialize_save() -> Dictionary[String, Variant]:
+#	return serialize_sync()
+
+func serialize_sync() -> Dictionary[String, Variant]:
+	return {
+		"scene_file_path" = scene_file_path,
+		"name" = name,
+		"x" = position.x,
+		"y" = position.y,
+		"id" = id,
+		"name_label" = name_label.text
+	}
+
+func deserialize(data:Dictionary) -> void:
+	position.x = data["x"]
+	position.y = data["y"]
+	id = data["id"]
+	name_label.text = data["name_label"]

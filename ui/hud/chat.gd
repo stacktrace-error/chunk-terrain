@@ -39,15 +39,17 @@ func show_recent() -> void:
 	fade_tween.tween_property(%Recent, "modulate", Color.TRANSPARENT, recent_fade_time)
 	fade_tween.tween_callback(%Recent.hide)
 
-func send_message(id:int, message:String) -> void:
-	rpc_msg.rpc(str(Lobby.players[id].colored_name(), ": ", message))
-
-func send_unsigned_message(message:String) -> void:
-	rpc_msg.rpc(message)
 
 @rpc("any_peer", "call_local")
-func rpc_msg(message:String) -> void:
-	#multiplayer.get_remote_sender_id()
+func rpc_send_message(message:String, signed:bool=true) -> void:
+	var peer_id : int = multiplayer.get_remote_sender_id()
+	
+	if message.begins_with("/sync"):
+		if multiplayer.is_server():
+			Surfaces.sync(peer_id)
+		return
+	
+	if signed: message = str(Lobby.players[peer_id].colored_name(), ": ", message)
 	add_message(message)
 
 func add_message(message:String) -> void:
@@ -65,7 +67,7 @@ func add_message(message:String) -> void:
 
 func _on_chat_input_text_submitted(new_text: String) -> void:
 	if new_text != "":
-		send_message(multiplayer.get_unique_id(), new_text)
+		rpc_send_message.rpc(new_text)
 	
 	%ChatInput.clear()
 	full = false

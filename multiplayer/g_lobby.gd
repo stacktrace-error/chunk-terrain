@@ -48,6 +48,7 @@ func host(port_var:Variant=default_port) -> void:
 	else:
 		disconnect_signals()
 
+
 func join(address_with_optional_port:String=str("localhost:",default_port)) -> void:
 	quit()
 	
@@ -98,7 +99,7 @@ func on_peer_authenticating(id:int) -> void:
 func on_peer_connected(id:int) -> void:
 	Surfaces.on_peer_connected(id)
 
-func on_peer_disconnected(id:int) -> void: 
+func on_peer_disconnected(id:int) -> void:
 	if players.has(id):
 		players[id].queue_free()
 
@@ -121,6 +122,7 @@ func quit() -> void:
 	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
 	
 	for player : Player in players.values(): player.queue_free()
+	players.clear()
 	Surfaces.clear()
 
 func local_player() -> Player:
